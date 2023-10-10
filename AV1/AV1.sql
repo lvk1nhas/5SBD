@@ -122,7 +122,7 @@ DELIMITER ;
 
 DELIMITER //
 
-CREATE PROCEDURE wl_processar_itens_pedidos()
+CREATE PROCEDURE ProcessarItens()
 BEGIN
     -- Declaração das variáveis
     DECLARE v_codigoPedido VARCHAR(32);
@@ -141,10 +141,8 @@ BEGIN
     -- Manipulador para quando o cursor não encontrar mais registros
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET pronta = 1;
 
-    -- Início da transação
     START TRANSACTION;
 
-    -- Abre o cursor de itens
     OPEN cursor_itens;
 
     -- Loop para processar todos os itens pendentes
@@ -156,7 +154,7 @@ BEGIN
             LEAVE itens_loop;
         END IF;
 
-        -- Calcula a quantidade total pendente do produto no estoque
+        -- Calcula a quantidade total de produtos pendentes que estão estoque
         SELECT SUM(quantidade) INTO quantidadePendente
         FROM wl_itens_pedidos 
         WHERE SKU = v_codigoProduto AND status = 'pendente';
@@ -196,6 +194,7 @@ BEGIN
 
     -- Commit da transação
     COMMIT;
+--CALL ProcessarPedidos(); deixei comentado mas pode ser usado para utilizar somente uma procedure que chamará outra já
 
 END //
 
@@ -203,7 +202,7 @@ DELIMITER ;
 
 DELIMITER //
 
-CREATE PROCEDURE wl_processar_pedidos()
+CREATE PROCEDURE ProcessarPedidos()
 BEGIN
     -- Declaração das variáveis
     DECLARE v_codigoPedido VARCHAR(32);
@@ -271,9 +270,11 @@ BEGIN
 
     -- Finalizar a transação
     COMMIT;
+
 END //
 
 DELIMITER ;
+
 
 
 -- TABELAS --------------------------------------------------------
