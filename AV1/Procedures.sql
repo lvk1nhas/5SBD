@@ -1,3 +1,4 @@
+--PROCEDURES
 
 DELIMITER $$
 
@@ -96,44 +97,41 @@ END$$
 
 DELIMITER ;
 
-DELIMITER $$
+DELIMITER //
 
-DELIMITER $$
-
-CREATE DEFINER=root@localhost PROCEDURE ProcessarItensPedidos ()   
+CREATE PROCEDURE ProcessarItens()
 BEGIN
-    -- Declarando as variáveis no início da procedure
-    DECLARE v_codigoPedido INT;
+    -- Declaração das variáveis
+    DECLARE v_codigoPedido VARCHAR(32);
     DECLARE v_codigoProduto VARCHAR(20);
     DECLARE v_quantidade INT;
-    DECLARE pronta INT DEFAULT 0;  -- Indica se o cursor já processou todos os registros
-    DECLARE estoqueDisponivel INT; -- Declaração da variável de estoque
-    DECLARE quantidadePendente INT; -- Declaração da variável para a quantidade total pendente do produto
-    
-    -- Cursor para selecionar os itens dos pedidos
+    DECLARE pronta INT DEFAULT 0;
+    DECLARE estoqueDisponivel INT;
+    DECLARE quantidadePendente INT;
+
+    -- Declaração do cursor
     DECLARE cursor_itens CURSOR FOR 
-    SELECT codigoPedido, SKU, quantidade 
-    FROM wl_itens_pedidos
-    WHERE status = 'pendente';  -- Apenas itens pendentes serão processados
-    
-    -- Handler para quando não houver mais registros no cursor
+        SELECT codigoPedido, SKU, quantidade 
+        FROM wl_itens_pedidos 
+        WHERE status = 'pendente';
+
+    -- Manipulador para quando o cursor não encontrar mais registros
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET pronta = 1;
 
-    -- Início da transação
     START TRANSACTION;
 
-    -- Abrindo o cursor de itens
     OPEN cursor_itens;
 
+    -- Loop para processar todos os itens pendentes
     itens_loop: LOOP
-        -- Buscando os dados do cursor
         FETCH cursor_itens INTO v_codigoPedido, v_codigoProduto, v_quantidade;
 
+        -- Se não houver mais registros, sai do loop
         IF pronta THEN
             LEAVE itens_loop;
         END IF;
 
-        -- Calcula a quantidade total pendente do produto no estoque
+        -- Calcula a quantidade total de produtos pendentes que estão estoque
         SELECT SUM(quantidade) INTO quantidadePendente
         FROM wl_itens_pedidos 
         WHERE SKU = v_codigoProduto AND status = 'pendente';
@@ -146,13 +144,12 @@ BEGIN
 
         -- Verifica se o estoque disponível é suficiente para todos os itens pendentes
         IF quantidadePendente <= estoqueDisponivel THEN
-            -- Aprova todos os itens pendentes para esse produto
+            -- Aprova todos os itens pendentes desse produto
             UPDATE wl_itens_pedidos 
             SET status = 'aprovado' 
             WHERE SKU = v_codigoProduto AND status = 'pendente';
-            
         ELSE
-            -- Marca todos os itens pendentes desse produto como pendentes
+            -- Se não houver estoque suficiente, marca os itens como pendentes novamente
             UPDATE wl_itens_pedidos 
             SET status = 'pendente' 
             WHERE SKU = v_codigoProduto AND status = 'pendente';
@@ -169,120 +166,88 @@ BEGIN
         END IF;
     END LOOP;
 
-    -- Fechando o cursor de itens
+    -- Fecha o cursor de itens
     CLOSE cursor_itens;
 
     -- Commit da transação
     COMMIT;
+--CALL ProcessarPedidos(); deixei comentado mas pode ser usado para utilizar somente uma procedure que chamará outra já
 
-END$$
+END //
 
 DELIMITER ;
 
-
-
-DELIMITER $$
+DELIMITER //
 
 CREATE PROCEDURE ProcessarPedidos()
 BEGIN
+    -- Declaração das variáveis
     DECLARE v_codigoPedido VARCHAR(32);
+    DECLARE pronta INT DEFAULT 0;
     DECLARE totalItens INT;
     DECLARE totalAprovados INT;
-    DECLARE pronto INT DEFAULT 0;
 
-    -- Declara um cursor para selecionar todos os códigos de pedido
+    -- Declaração do cursor (antes do handler)
     DECLARE cursor_pedidos CURSOR FOR 
-    SELECT DISTINCT codigoPedido 
-    FROM wl_itens_pedidos;
+        SELECT DISTINCT codigoPedido 
+        FROM wl_itens_pedidos 
+        WHERE status = 'pendente' OR status = 'aprovado';
 
-    -- Manipulador para o final do cursor
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET pronto = 1;
+    -- Handler para fim do cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET pronta = 1;
 
     -- Início da transação
     START TRANSACTION;
 
-    -- Abre o cursor
+    -- Abrir o cursor de pedidos
     OPEN cursor_pedidos;
 
     pedidos_loop: LOOP
-        -- Busca o próximo código de pedido
+        -- Buscar o próximo pedido
         FETCH cursor_pedidos INTO v_codigoPedido;
 
-        -- Se o cursor tiver terminado, sai do loop
-        IF pronto THEN
+        -- Se não houver mais pedidos, sair do loop
+        IF pronta THEN
             LEAVE pedidos_loop;
         END IF;
 
-        -- Conta o total de itens do pedido
+        -- Contar itens no pedido
         SELECT COUNT(*) INTO totalItens 
         FROM wl_itens_pedidos 
         WHERE codigoPedido = v_codigoPedido;
 
-        -- Conta o total de itens aprovados do pedido
+        -- Contar itens aprovados
         SELECT COUNT(*) INTO totalAprovados 
         FROM wl_itens_pedidos 
         WHERE codigoPedido = v_codigoPedido AND status = 'aprovado';
 
-        -- Verifica se todos os itens estão aprovados
-        IF totalItens = totalAprovados THEN
-            -- Atualiza o status do pedido para aprovado
+        -- Verificar se todos os itens do pedido estão aprovados
+        IF totalItens = totalAprovados AND totalItens > 0 THEN
+            -- Atualizar o status do pedido para 'aprovado'
             UPDATE wl_pedidos 
             SET status = 'aprovado' 
             WHERE codigoPedido = v_codigoPedido;
 
-            -- Chama a procedure para debitar o estoque agora que o pedido foi aprovado
-            CALL DebitarEstoquePedido(v_codigoPedido);
+            -- Debitar itens do estoque com base nos itens aprovados
+            UPDATE wl_estoque e
+            INNER JOIN wl_itens_pedidos i ON e.SKU = i.SKU
+            SET e.quantidade = e.quantidade - i.quantidade
+            WHERE i.codigoPedido = v_codigoPedido 
+              AND i.status = 'aprovado';
+        ELSE
+            -- Caso contrário, manter o status do pedido como 'pendente'
+            UPDATE wl_pedidos 
+            SET status = 'pendente' 
+            WHERE codigoPedido = v_codigoPedido;
         END IF;
     END LOOP;
 
-    -- Fechando o cursor de pedidos
+    -- Fechar o cursor
     CLOSE cursor_pedidos;
 
-    -- Commit da transação
+    -- Finalizar a transação
     COMMIT;
 
-END$$
-
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE PROCEDURE DebitarEstoquePedido(v_codigoPedido VARCHAR(32))
-BEGIN
-    DECLARE v_codigoProduto VARCHAR(20);
-    DECLARE v_quantidade INT;
-    DECLARE pronto INT DEFAULT 0;
-
-    -- Declara um cursor para pegar os itens aprovados do pedido
-    DECLARE cursor_itens_pedido CURSOR FOR 
-    SELECT SKU, quantidade
-    FROM wl_itens_pedidos
-    WHERE codigoPedido = v_codigoPedido AND status = 'aprovado';
-
-    -- Manipulador para o final do cursor
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET pronto = 1;
-
-    -- Abre o cursor
-    OPEN cursor_itens_pedido;
-
-    itens_pedido_loop: LOOP
-        -- Busca os dados do item aprovado
-        FETCH cursor_itens_pedido INTO v_codigoProduto, v_quantidade;
-
-        -- Se o cursor não tiver mais itens, sai do loop
-        IF pronto THEN
-            LEAVE itens_pedido_loop;
-        END IF;
-
-        -- Debita o estoque do item aprovado
-        UPDATE wl_estoque 
-        SET quantidade = quantidade - v_quantidade 
-        WHERE SKU = v_codigoProduto;
-    END LOOP;
-
-    -- Fechando o cursor
-    CLOSE cursor_itens_pedido;
-
-END$$
+END //
 
 DELIMITER ;
