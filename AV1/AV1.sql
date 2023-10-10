@@ -194,7 +194,6 @@ BEGIN
 
     -- Commit da transação
     COMMIT;
---CALL ProcessarPedidos(); deixei comentado mas pode ser usado para utilizar somente uma procedure que chamará outra já
 
 END //
 
