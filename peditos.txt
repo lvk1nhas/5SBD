@@ -1,0 +1,5 @@
+"12345";"2024-08-20";"SKU123";"UPC987654321";"Produto A";"2";"100.50";"10.00";"cliente1@email.com";"001";"Cliente Um";"Rua A, 123";"12345-678";"SP";"Brasil"
+"12346";"2024-08-21";"SKU124";"UPC987654322";"Produto B";"1";"200.00";"20.00";"cliente2@email.com";"002";"Cliente Dois";"Avenida B, 456";"87654-321";"RJ";"Brasil"
+"12347";"2024-08-22";"SKU125";"UPC987654323";"Produto C";"3";"300.75";"15.00";"cliente3@email.com";"003";"Cliente Três";"Praça C, 789";"54321-987";"MG";"Brasil"
+"12348";"2024-08-23";"SKU126";"UPC987654324";"Produto D";"5";"400.50";"25.00";"cliente4@email.com";"004";"Cliente Quatro";"Rua D, 111";"23456-789";"SP";"Brasil"
+"12349";"2024-08-24";"SKU127";"UPC987654325";"Produto E";"4";"500.25";"30.00";"cliente5@email.com";"005";"Cliente Cinco";"Avenida E, 222";"76543-210";"RJ";"Brasil"
