@@ -1,0 +1,58 @@
+1. Inserir dados na tabela Cliente:
+
+sql
+INSERT INTO Cliente (id, nome, cpf, email, codMarketplace, telefone) 
+SELECT DISTINCT nomecliente, cpf, email, codcliente, telefone 
+FROM carga;
+
+2. Fazer um INSERT de um arquivo:
+
+sql
+LOAD DATA INFILE '/casol/para/seu/arquivo.csv' 
+INTO TABLE Cliente
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(id, nome, cpf, email, codMarketplace, telefone);
+
+3. Multiplicar produto por quantidade e somar itens pedidos:
+
+sql
+SELECT produto, quantidade, (quantidade * preco) AS total 
+FROM pedidos;
+
+(exemplo: soma do total de uma compra):
+
+sql
+SELECT SUM(quantidade * preco) AS total_pedido 
+FROM pedidos;
+
+4. Exibir a entrega, colocando o maior valor no topo e o menor em último: 
+Utilizando Order By.
+
+sql
+SELECT produto, quantidade, (quantidade * preco) AS total 
+FROM entregas 
+ORDER BY total DESC;
+
+5. Debitar o que foi entregue do estoque:
+Utilizando uma subtração com um UPDATE.
+
+sql
+UPDATE estoque e
+JOIN entregas en ON e.produto = en.produto
+SET e.quantidade = e.quantidade - en.quantidade;
+
+6. Quando acabar o estoque de um produto, colocá-lo na tabela compra:
+
+sql
+INSERT INTO compra (produto, data_compra)
+SELECT produto, CURDATE() 
+FROM estoque 
+WHERE quantidade <= 0;
+
+Após isso, garantir que o estoque seja atualizado corretamente:
+
+sql
+DELETE FROM estoque WHERE quantidade <= 0;
