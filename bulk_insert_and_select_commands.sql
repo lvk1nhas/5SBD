@@ -1,11 +1,12 @@
 1 º comando: SQL pra importação dos dados em arquivo CSV:
 
 LOAD DATA INFILE 'C:/Users/casol/Downloads/produtos.csv'
-INTO TABLE waterfall_produtos
+INTO TABLE wl_produtos
 FIELDS TERMINATED BY ',' 
 OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
-(id, codigo, nome, valor, qtd);
+(id, codigo, nome, valor, quantidade);
+
 
 
 2 º comando: Selecionar clientes sem repetição
