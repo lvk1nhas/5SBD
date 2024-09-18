@@ -14,8 +14,8 @@ SELECT DISTINCT codigoComprador, email, endereco, CEP, UF, pais FROM wl_tempdata
 
 3º comando: Inserindo dados do TXT no banco
 LOAD DATA INFILE 'C:/Users/casol/Downloads/pedidos.txt'
-INTO TABLE waterfall_dadostemp
+INTO TABLE wl_tempdata
 FIELDS TERMINATED BY ';' 
 ENCLOSED BY '"' 
 LINES TERMINATED BY '\n'
-(codigoPedido, dataPedido, SKU, UPC, nomeProduto, qtd, valor, frete, email, codigoComprador, nomeComprador, endereco, CEP, UF, pais);
+(codigoPedido, dataPedido, SKU, UPC, nomeProduto, quantidade, valor, frete, email, codigoComprador, nomeComprador, endereco, CEP, UF, pais);
