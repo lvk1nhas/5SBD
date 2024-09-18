@@ -1,7 +1,7 @@
 1 º comando: SQL pra importação dos dados em arquivo CSV:
 
 LOAD DATA INFILE 'C:/Users/casol/Downloads/[5SBD] Planilha de Dados - Produtos  - Produtos.csv'
-INTO TABLE produtos
+INTO TABLE sbd_produtos
 FIELDS TERMINATED BY ',' 
 OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
@@ -14,7 +14,7 @@ SELECT DISTINCT codigoComprador, email, endereco, CEP, UF, pais FROM pedidos_tem
 
 3º comando: Inserindo dados do TXT no banco
 LOAD DATA INFILE 'C:/Users/casol/Downloads/pedidos.txt'
-INTO TABLE pedidos_temp
+INTO TABLE sbd_datatemp
 FIELDS TERMINATED BY ';' 
 ENCLOSED BY '"' 
 LINES TERMINATED BY '\n'
