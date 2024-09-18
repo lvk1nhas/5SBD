@@ -1,5 +1,10 @@
-"12345";"2024-08-20";"SKU123";"UPC987654321";"Produto A";"2";"100.50";"10.00";"cliente1@email.com";"001";"Cliente Um";"Rua A, 123";"12345-678";"SP";"Brasil"
-"12346";"2024-08-21";"SKU124";"UPC987654322";"Produto B";"1";"200.00";"20.00";"cliente2@email.com";"002";"Cliente Dois";"Avenida B, 456";"87654-321";"RJ";"Brasil"
-"12347";"2024-08-22";"SKU125";"UPC987654323";"Produto C";"3";"300.75";"15.00";"cliente3@email.com";"003";"Cliente Três";"Praça C, 789";"54321-987";"MG";"Brasil"
-"12348";"2024-08-23";"SKU126";"UPC987654324";"Produto D";"5";"400.50";"25.00";"cliente4@email.com";"004";"Cliente Quatro";"Rua D, 111";"23456-789";"SP";"Brasil"
-"12349";"2024-08-24";"SKU127";"UPC987654325";"Produto E";"4";"500.25";"30.00";"cliente5@email.com";"005";"Cliente Cinco";"Avenida E, 222";"76543-210";"RJ";"Brasil"
+ABC123;2024-09-01;eletr001sp;123;Carregador Portátil;2;20.99;5.75;jose@example.com;001;José Silva;Rua A, 123;12345678;SP;Brasil
+ABC124;2024-09-01;brinq345rj;456;Carrinho de Bebê;1;15.50;3.50;maria@example.com;002;Maria Oliveira;Rua B, 456;23456789;RJ;Brasil
+ABC125;2024-09-02;roupa789mg;789;Camisa Polo;3;30.00;7.20;pedro@example.com;003;Pedro Santos;Rua C, 789;34567890;MG;Brasil
+ABC126;2024-09-02;eletr234rs;234;Fone de Ouvido Bluetooth;5;50.75;10.10;ana@example.com;004;Ana Costa;Rua D, 101;45678901;RS;Brasil
+ABC127;2024-09-03;brinq567ba;567;Boneca de Pelúcia;2;25.30;4.00;luan@example.com;005;Luan Almeida;Rua E, 202;56789012;BA;Brasil
+ABC128;2024-09-03;roupa890pr;890;Calça Jeans;4;40.45;8.55;carla@example.com;006;Carla Ferreira;Rua F, 303;67890123;PR;Brasil
+ABC129;2024-09-04;eletr345sc;345;Smartwatch;1;12.99;2.25;fernando@example.com;007;Fernando Lima;Rua G, 404;78901234;SC;Brasil
+ABC130;2024-09-04;brinq678es;678;Educação Infantil;6;60.10;12.75;tatiane@example.com;008;Tatiane Martins;Rua H, 505;89012345;ES;Brasil
+ABC131;2024-09-05;roupa901go;901;Jaqueta de Couro;3;27.80;6.90;roberto@example.com;009;Roberto Oliveira;Rua I, 606;90123456;GO;Brasil
+ABC132;2024-09-05;eletr456mt;456;Roteador Wireless;2;18.55;4.50;amanda@example.com;010;Amanda Souza;Rua J, 707;01234567;MT;Brasil
