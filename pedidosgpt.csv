@@ -1,3 +1,4 @@
+codigoPedido;dataPedido;SKU;UPC;nomeProduto;qtd;valor;frete;email;codigoComprador;nomeComprador;endereco;CEP;UF;pais
 ABC123;2024-09-01;eletr001sp;123;Carregador Portátil;2;20.99;5.75;jose@example.com;001;José Silva;Rua A, 123;12345678;SP;Brasil
 ABC124;2024-09-01;brinq345rj;456;Carrinho de Bebê;1;15.50;3.50;maria@example.com;002;Maria Oliveira;Rua B, 456;23456789;RJ;Brasil
 ABC125;2024-09-02;roupa789mg;789;Camisa Polo;3;30.00;7.20;pedro@example.com;003;Pedro Santos;Rua C, 789;34567890;MG;Brasil
