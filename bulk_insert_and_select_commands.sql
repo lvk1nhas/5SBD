@@ -9,7 +9,7 @@ LINES TERMINATED BY '\n'
 
 
 2 º comando para selecionar clientes sem repetição
-SELECT DISTINCT codigoComprador, email, endereco, CEP, UF, pais FROM tempdata GROUP BY codigoComprador;
+SELECT DISTINCT codigoComprador, email, endereco, CEP, UF, pais FROM pedidos_temp GROUP BY codigoComprador;
 
 
 //Inserindo dados do TXT no banco
