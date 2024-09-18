@@ -1,0 +1,28 @@
+Atividade 2
+
+Preencha a tabela ENTREGA, COMPRA e debitar de ESTOQUE
+
+Segundo o professor, para preencher a tabela ENTREGA, você vai precisar analisar o pedido, multiplicando o produto pela quantidade pedida e somando o valor de cada item pedido (usando CURSOR).  
+Em seguida ordenará a tabela ENTREGA do maior pedido total pro menor pedido total. 
+Conforme as entregas forem acontecendo, debite os produtos da tabela produtos e quando adcabar o estoque passe esse produto pra tabela “compras” porque é o que precisa ser comprado para preencher o estoque.
+
+
+Calcular o valor total pelo pedido
+Ordenar pelo maior valor (ORDER BY valorTotal DESC)
+
+Tabelas:
+Tabela de pedido
+status? quando o status for “pendente”, deve-se fazer todo o procedimento (André falou)
+Tabela de compra
+Tabela de entrega
+Tabela de estoque
+Tabela de cliente
+Tabela de itens do pedido
+Tabela de dadostemp (carregar conteúdo)
+Tabela de produtos
+
+
+SKU - código pra produto (outros)
+UPC - código pra produto (brasil)
+
+Utilizar SQL SERVER DEVELOPER, escolha do professor
