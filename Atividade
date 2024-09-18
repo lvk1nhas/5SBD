@@ -1,0 +1,23 @@
+Atividade
+
+
+Com os dados armazenados do arquivo TXT,
+Crie uma tabela temporária
+Inclua na tabela temporária
+Crie a tabela Cliente
+Crie a tabela Pedido
+Crie a tabela de Item do Pedido
+Insira os dados
+
+Observações do André:
+Pedidos devem ser identificados pelo código do comprador
+Uma linha para cada produto que o cliente comprou (mas não significa que são dois pedidos)
+
+
+Campos da tabela Cliente:
+email
+codigoComprador
+endereco
+CEP
+UF
+país
