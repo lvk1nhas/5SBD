@@ -1,4 +1,4 @@
-1 º comando SQL pra importação dos dados em arquivo CSV:
+1 º comando: SQL pra importação dos dados em arquivo CSV:
 
 LOAD DATA INFILE 'C:/Users/casol/Downloads/[5SBD] Planilha de Dados - Produtos  - Produtos.csv'
 INTO TABLE produtos
@@ -8,11 +8,11 @@ LINES TERMINATED BY '\n'
 (id, codigo, nome, valor, qtd);
 
 
-2 º comando para selecionar clientes sem repetição
+2 º comando: Selecionar clientes sem repetição
 SELECT DISTINCT codigoComprador, email, endereco, CEP, UF, pais FROM pedidos_temp GROUP BY codigoComprador;
 
 
-//Inserindo dados do TXT no banco
+3º comando: Inserindo dados do TXT no banco
 LOAD DATA INFILE 'C:/Users/casol/Downloads/pedidos.txt'
 INTO TABLE pedidos_temp
 FIELDS TERMINATED BY ';' 
