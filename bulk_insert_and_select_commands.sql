@@ -14,7 +14,7 @@ SELECT DISTINCT codigoComprador, email, endereco, CEP, UF, pais FROM tempdata GR
 
 //Inserindo dados do TXT no banco
 LOAD DATA INFILE 'C:/Users/casol/Downloads/pedidos.txt'
-INTO TABLE sbd_tempdata
+INTO TABLE pedidos_temp
 FIELDS TERMINATED BY ';' 
 ENCLOSED BY '"' 
 LINES TERMINATED BY '\n'
