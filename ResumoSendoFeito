@@ -185,7 +185,6 @@ FIELDS TERMINATED BY ';' ENCLOSED BY '"' LINES TERMINATED BY '\n'
 
 —
 
-Para preencher as tabelas, existe uma ordem a ser seguida (considerando que as tabelas     possuem chaves estrangeiras). 
 
 
 
@@ -196,7 +195,7 @@ SELECT DISTINCT codigoComprador, nomeComprador, email, endereco, CEP, UF, pais F
 
 
 
-Comando SQL para Inserir Compras: [ainda não fiz pq depende de codigoPedido]
+Comando SQL para Inserir Compras:
 INSERT INTO wl_compras (codigoPedido, valor, frete)
 SELECT DISTINCT codigoPedido, valor, frete
 FROM wl_tempdata;
@@ -265,8 +264,6 @@ Tabela de Produtos: Para armazenar informações sobre os produtos.
 Observações Adicionais:
 SKU: Código do produto.
 UPC: Código do produto (Brasil).
-
-
 
 
 
