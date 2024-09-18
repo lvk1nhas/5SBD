@@ -21,3 +21,86 @@ endereco
 CEP
 UF
 país
+
+Resposta da atividade
+
+1. Criar a Tabela Temporária
+
+CREATE TEMPORARY TABLE wl_tempdata (
+    codigoPedido VARCHAR(255),
+    dataPedido DATE,
+    SKU VARCHAR(255),
+    UPC VARCHAR(255),
+    nomeProduto VARCHAR(255),
+    quantidade INT,
+    valor DECIMAL(10,2),
+    frete DECIMAL(10,2),
+    email VARCHAR(255),
+    codigoComprador VARCHAR(255),
+    nomeComprador VARCHAR(255),
+    endereco VARCHAR(255),
+    CEP VARCHAR(10),
+    UF CHAR(2),
+    pais VARCHAR(50)
+);
+
+
+2. Criar a Tabela Cliente
+
+CREATE TABLE wl_clientes (
+    nomeComprador TEXT(255),
+    email VARCHAR(255),
+    codigoComprador VARCHAR(255),
+    endereco VARCHAR(255),
+    CEP VARCHAR(10),
+    UF CHAR(2),
+    pais VARCHAR(50),
+    PRIMARY KEY (codigoComprador)
+);
+
+3. Criar a Tabela Pedido
+
+CREATE TABLE wl_pedidos (
+    codigoPedido VARCHAR(255),
+    dataPedido DATE,
+    codigoComprador VARCHAR(255),
+    PRIMARY KEY (codigoPedido),
+    FOREIGN KEY (codigoComprador) REFERENCES wl_clientes(codigoComprador)
+);
+
+4. Criar a Tabela Item do Pedido
+
+CREATE TABLE wl_ItemPedido (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    codigoPedido VARCHAR(255),
+    SKU VARCHAR(255),
+    UPC VARCHAR(255),
+    nomeProduto VARCHAR(255),
+    quantidade INT,
+    valor DECIMAL(10,2),
+    frete DECIMAL(10,2),
+    FOREIGN KEY (codigoPedido) REFERENCES wl_pedidos(codigoPedido)
+);
+
+Inserir os Dados
+
+1. Inserir Dados na Tabela Cliente:
+
+INSERT INTO wl_clientes (nomeComprador, email, codigoComprador, endereco, CEP, UF, pais) SELECT DISTINCT nomeComprador, email, codigoComprador, endereco, CEP, UF, pais FROM wl_tempdata GROUP BY codigoComprador;
+
+2. Inserir Dados na Tabela Pedido:
+
+
+INSERT INTO wl_pedidos (codigoPedido, dataPedido, codigoComprador)
+SELECT DISTINCT codigoPedido, dataPedido, codigoComprador
+FROM wl_tempdata;
+
+Explicação sem group by: O DISTINCT já garante que as combinações de codigoPedido, dataPedido, e codigoComprador sejam únicas. Não é necessário agrupar por uma coluna específica porque o DISTINCT já lida com a eliminação de duplicatas.
+
+3. Inserir Dados na Tabela ItemPedido:
+
+
+INSERT INTO wl_ItemPedido (codigoPedido, SKU, UPC, nomeProduto, quantidade, valor, frete)
+SELECT codigoPedido, SKU, UPC, nomeProduto, quantidade, valor, frete
+FROM wl_tempdata
+
