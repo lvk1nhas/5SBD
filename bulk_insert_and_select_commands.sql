@@ -10,8 +10,7 @@ LINES TERMINATED BY '\n'
 
 
 2 º comando: Selecionar clientes sem repetição
-SELECT DISTINCT codigoComprador, email, endereco, CEP, UF, pais FROM pedidos_temp GROUP BY codigoComprador;
-
+SELECT DISTINCT codigoComprador, email, endereco, CEP, UF, pais FROM wl_tempdata GROUP BY codigoComprador;
 
 3º comando: Inserindo dados do TXT no banco
 LOAD DATA INFILE 'C:/Users/casol/Downloads/pedidos.txt'
