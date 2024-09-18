@@ -1,0 +1,36 @@
+DECLARE @id INT, @total DECIMAL(9,2), @status INT, @upc VARCHAR(50), @nome VARCHAR(50);
+DECLARE @idv VARCHAR(10);
+
+DECLARE pedidoProcCursor CURSOR
+FOR 
+    SELECT p.id, p.total, p.status, pp.upc, pp.nome  
+    FROM [Pedidos] p
+    INNER JOIN PedidosItens pp ON pp.idPedido = p.id
+    ORDER BY p.total DESC;
+
+-- Abre o cursor
+OPEN pedidoProcCursor;
+
+-- Busca o primeiro registro
+FETCH NEXT FROM pedidoProcCursor INTO @id, @total, @status, @upc, @nome;
+
+-- Laço para processar os registros
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    -- Converte o id para string
+    SET @idv = CONVERT(VARCHAR(10), @id);
+
+    -- Exibe as informações do pedido
+    PRINT('Id: ' + @idv);
+    PRINT('Total: ' + CONVERT(VARCHAR(10), @total));
+    PRINT('UPC: ' + @upc);
+    PRINT('Nome: ' + @nome);
+    PRINT('Status: ' + CONVERT(VARCHAR(10), @status));
+
+    -- Busca o próximo registro
+    FETCH NEXT FROM pedidoProcCursor INTO @id, @total, @status, @upc, @nome;
+END;
+
+-- Fecha e desaloca o cursor
+CLOSE pedidoProcCursor;
+DEALLOCATE pedidoProcCursor;
