@@ -1,0 +1,75 @@
+Atividade preenchendo as tabelas
+
+[Gerar um arquivo CSV (com ajuda de uma Inteligência Artificial) preenchendo os campos codigoPedido;dataPedido;SKU;UPC;nomeProduto;qtd;valor;frete;email;codigoComprador;nomeComprador;endereco;CEP;UF;pais]
+
+Inserindo os dados na tabela wl_tempdata:
+
+LOAD DATA INFILE 'C:/Users/casol/downloads/pedidosgpt.csv'
+INTO TABLE wl_tempdata
+FIELDS TERMINATED BY ';' ENCLOSED BY '"' LINES TERMINATED BY '\n'
+(codigoPedido, dataPedido, SKU, UPC, nomeProduto, quantidade, valor, frete, email, codigoComprador, nomeComprador, endereco, CEP, UF, pais);
+
+
+
+
+
+
+—
+
+
+
+
+
+Comando SQL para Inserir Clientes:
+INSERT INTO wl_clientes (codigoComprador, nomeComprador, email, endereco, CEP, UF, pais) 
+SELECT DISTINCT codigoComprador, nomeComprador, email, endereco, CEP, UF, pais FROM wl_tempdata GROUP BY email;
+
+
+
+Comando SQL para Inserir Compras:
+INSERT INTO wl_compras (codigoPedido, valor, frete)
+SELECT DISTINCT codigoPedido, valor, frete
+FROM wl_tempdata;
+
+
+
+
+Comando SQL para Inserir Entregas: 
+INSERT INTO wl_entregas (codigoPedido, endereco, CEP, UF, pais)
+SELECT DISTINCT codigoPedido, endereco, CEP, UF, pais
+FROM wl_tempdata;
+
+
+
+
+Comando SQL para Inserir no Estoque:
+INSERT INTO wl_estoque (SKU, quantidade)
+SELECT DISTINCT SKU, SUM(quantidade) AS quantidade
+FROM wl_tempdata
+GROUP BY SKU;
+
+
+
+
+
+Comando SQL para Inserir ItemPedido:
+INSERT INTO wl_itempedido (codigoPedido, SKU, UPC, nomeProduto, quantidade, valor)
+SELECT codigoPedido, SKU, UPC, nomeProduto, quantidade, valor
+FROM wl_tempdata;
+
+
+
+
+Comando SQL para Inserir Pedidos:
+INSERT INTO wl_pedidos (codigoPedido, dataPedido, codigoComprador) SELECT DISTINCT codigoPedido, dataPedido, codigoComprador FROM wl_tempdata;
+
+
+Comando SQL para Inserir Produtos:
+INSERT INTO wl_produtos (SKU, UPC, nomeProduto, valor)
+SELECT DISTINCT SKU, UPC, nomeProduto, valor
+FROM wl_tempdata
+WHERE SKU NOT IN (SELECT DISTINCT SKU FROM wl_produtos);
+
+
+
+
