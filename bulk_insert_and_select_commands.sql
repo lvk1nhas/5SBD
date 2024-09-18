@@ -14,7 +14,7 @@ SELECT DISTINCT codigoComprador, email, endereco, CEP, UF, pais FROM pedidos_tem
 
 3º comando: Inserindo dados do TXT no banco
 LOAD DATA INFILE 'C:/Users/casol/Downloads/pedidos.txt'
-INTO TABLE sbd_datatemp
+INTO TABLE sbd_dadostemp
 FIELDS TERMINATED BY ';' 
 ENCLOSED BY '"' 
 LINES TERMINATED BY '\n'
