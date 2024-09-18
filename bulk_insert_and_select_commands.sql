@@ -1,6 +1,6 @@
 1 º comando: SQL pra importação dos dados em arquivo CSV:
 
-LOAD DATA INFILE 'C:/Users/casol/Downloads/[5SBD] Planilha de Dados - Produtos  - Produtos.csv'
+LOAD DATA INFILE 'C:/Users/casol/Downloads/produtos.csv'
 INTO TABLE waterfall_produtos
 FIELDS TERMINATED BY ',' 
 OPTIONALLY ENCLOSED BY '"'
