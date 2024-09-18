@@ -1,0 +1,274 @@
+FAETERJ-Rio
+5SBD - Scripts de Banco de Dados e SQL - 2024.2
+Professor: André Neves | Aluno: Lucas Oliveira
+
+
+
+Aula #3 - 28 de agosto de 2024
+Inserção de dados por meio de um arquivo CSV (colunas separadas por vírgula) para o banco de dados.
+
+Comandos SQL
+
+Importação de dados por arquivo CSV:
+
+Comando: SQL pra importação dos dados em arquivo CSV:
+
+LOAD DATA INFILE 'C:/Users/casol/Downloads/produtos.csv'
+INTO TABLE wl_produtos
+FIELDS TERMINATED BY ',' 
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+(id, codigo, nome, valor, quantidade);
+
+
+Descrição do comando:
+Carregando conteúdo dentro do arquivo [produtos.csv]
+para dentro da tabela [sbd_produtos]
+com campos terminados em [vírgula], encapsulados por [aspas] e linhas terminando em [quebra de linha]
+para as colunas [id, código, nome, preço e quantidade].
+
+
+Comando: Inserindo dados do TXT no banco
+LOAD DATA INFILE 'C:/Users/casol/Downloads/pedidos.txt'
+INTO TABLE wl_tempdata
+FIELDS TERMINATED BY ';' 
+ENCLOSED BY '"' 
+LINES TERMINATED BY '\n'
+(codigoPedido, dataPedido, SKU, UPC, nomeProduto, quantidade, valor, frete, email, codigoComprador, nomeComprador, endereco, CEP, UF, pais);
+
+Descrição do comando:
+Carregando conteúdo dentro do arquivo [produtos.csv]
+para dentro da tabela [sbd_tempdata]
+com campos terminados em [ponto e vírgula], encapsulados por [aspas] e linhas terminando em [quebra de linha]
+para as colunas [codigoPedido, dataPedido, SKU, UPC, nomeProduto, qtd, valor, frete, email, codigoComprador, nomeComprador, endereco, CEP, UF e pais].
+
+
+Comando: Selecionar clientes sem repetição
+SELECT DISTINCT codigoComprador, email, endereco, CEP, UF, pais FROM wl_tempdata GROUP BY codigoComprador;
+
+
+Descrição do comando:
+Selecionar distintamente [codigoComprador, email, endereco, CEP, UF, pais] da tabela [sbd_tempdata], agrupando a consulta em [codigoComprador].
+
+
+
+ATIVIDADE
+
+Passo-a-passo (segundo o professor):
+
+Com os dados armazenados no arquivo TXT,
+Criar uma tabela temporária
+Incluir na tabela temporária
+Criar a tabela Cliente
+Criar a tabela Pedido
+Criar a tabela de Item do Pedido
+Inserir os dados
+
+Observações:
+PEDIDOS: identificar pelo código do comprador
+linha para cada produto que o cliente comprou (não significa que são dois pedidos)
+
+
+Campos da tabela Cliente:
+email
+codigoComprador
+endereco
+CEP
+UF
+pais
+
+
+Resposta da atividade
+
+1. Criar a Tabela Temporária
+
+CREATE TEMPORARY TABLE wl_tempdata (
+    codigoPedido VARCHAR(255),
+    dataPedido DATE,
+    SKU VARCHAR(255),
+    UPC VARCHAR(255),
+    nomeProduto VARCHAR(255),
+    quantidade INT,
+    valor DECIMAL(10,2),
+    frete DECIMAL(10,2),
+    email VARCHAR(255),
+    codigoComprador VARCHAR(255),
+    nomeComprador VARCHAR(255),
+    endereco VARCHAR(255),
+    CEP VARCHAR(10),
+    UF CHAR(2),
+    pais VARCHAR(50)
+);
+
+
+2. Criar a Tabela Cliente
+
+CREATE TABLE wl_clientes (
+    nomeComprador TEXT(255),
+    email VARCHAR(255),
+    codigoComprador VARCHAR(255),
+    endereco VARCHAR(255),
+    CEP VARCHAR(10),
+    UF CHAR(2),
+    pais VARCHAR(50),
+    PRIMARY KEY (codigoComprador)
+);
+
+3. Criar a Tabela Pedido
+
+CREATE TABLE wl_pedidos (
+    codigoPedido VARCHAR(255),
+    dataPedido DATE,
+    codigoComprador VARCHAR(255),
+    PRIMARY KEY (codigoPedido),
+    FOREIGN KEY (codigoComprador) REFERENCES wl_clientes(codigoComprador)
+);
+
+4. Criar a Tabela Item do Pedido
+
+CREATE TABLE wl_ItemPedido (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    codigoPedido VARCHAR(255),
+    SKU VARCHAR(255),
+    UPC VARCHAR(255),
+    nomeProduto VARCHAR(255),
+    quantidade INT,
+    valor DECIMAL(10,2),
+    frete DECIMAL(10,2),
+    FOREIGN KEY (codigoPedido) REFERENCES wl_pedidos(codigoPedido)
+);
+
+Inserir os Dados
+
+1. Inserir Dados na Tabela Cliente:
+
+INSERT INTO wl_clientes (nomeComprador, email, codigoComprador, endereco, CEP, UF, pais) SELECT DISTINCT nomeComprador, email, codigoComprador, endereco, CEP, UF, pais FROM wl_tempdata GROUP BY codigoComprador;
+
+2. Inserir Dados na Tabela Pedido:
+
+
+INSERT INTO wl_pedidos (codigoPedido, dataPedido, codigoComprador)
+SELECT DISTINCT codigoPedido, dataPedido, codigoComprador
+FROM wl_tempdata;
+
+Explicação sem group by: O DISTINCT já garante que as combinações de codigoPedido, dataPedido, e codigoComprador sejam únicas. Não é necessário agrupar por uma coluna específica porque o DISTINCT já lida com a eliminação de duplicatas.
+
+3. Inserir Dados na Tabela ItemPedido:
+
+
+INSERT INTO wl_ItemPedido (codigoPedido, SKU, UPC, nomeProduto, quantidade, valor, frete)
+SELECT codigoPedido, SKU, UPC, nomeProduto, quantidade, valor, frete
+FROM wl_tempdata
+
+
+
+
+
+
+
+
+Atividade preenchendo as tabelas
+
+[Gerar um arquivo CSV (com ajuda de uma Inteligência Artificial) preenchendo os campos codigoPedido;dataPedido;SKU;UPC;nomeProduto;qtd;valor;frete;email;codigoComprador;nomeComprador;endereco;CEP;UF;pais]
+
+Inserindo os dados na tabela wl_tempdata:
+
+LOAD DATA INFILE 'C:/Users/casol/downloads/pedidosgpt.csv'
+INTO TABLE wl_tempdata
+FIELDS TERMINATED BY ';' ENCLOSED BY '"' LINES TERMINATED BY '\n'
+(codigoPedido, dataPedido, SKU, UPC, nomeProduto, quantidade, valor, frete, email, codigoComprador, nomeComprador, endereco, CEP, UF, pais);
+
+
+
+
+
+
+—
+
+Para preencher as tabelas, existe uma ordem a ser seguida (considerando que as tabelas     possuem chaves estrangeiras). 
+
+
+
+
+Comando SQL para Inserir Clientes:
+INSERT INTO wl_clientes (codigoComprador, nomeComprador, email, endereco, CEP, UF, pais) 
+SELECT DISTINCT codigoComprador, nomeComprador, email, endereco, CEP, UF, pais FROM wl_tempdata GROUP BY email;
+
+
+
+Comando SQL para Inserir Compras: [ainda não fiz pq depende de codigoPedido]
+INSERT INTO wl_compras (codigoPedido, valor, frete)
+SELECT DISTINCT codigoPedido, valor, frete
+FROM wl_tempdata;
+
+
+
+
+Comando SQL para Inserir Entregas: 
+INSERT INTO wl_entregas (codigoPedido, endereco, CEP, UF, pais)
+SELECT DISTINCT codigoPedido, endereco, CEP, UF, pais
+FROM wl_tempdata;
+
+
+
+
+Comando SQL para Inserir no Estoque:
+INSERT INTO wl_estoque (SKU, quantidade)
+SELECT DISTINCT SKU, SUM(quantidade) AS quantidade
+FROM wl_tempdata
+GROUP BY SKU;
+
+
+
+
+
+Comando SQL para Inserir ItemPedido:
+INSERT INTO wl_itempedido (codigoPedido, SKU, UPC, nomeProduto, quantidade, valor)
+SELECT codigoPedido, SKU, UPC, nomeProduto, quantidade, valor
+FROM wl_tempdata;
+
+
+
+
+Comando SQL para Inserir Pedidos:
+INSERT INTO wl_pedidos (codigoPedido, dataPedido, codigoComprador) SELECT DISTINCT codigoPedido, dataPedido, codigoComprador FROM wl_tempdata;
+
+
+Comando SQL para Inserir Produtos:
+INSERT INTO wl_produtos (SKU, UPC, nomeProduto, valor)
+SELECT DISTINCT SKU, UPC, nomeProduto, valor
+FROM wl_tempdata
+WHERE SKU NOT IN (SELECT DISTINCT SKU FROM wl_produtos);
+
+
+
+
+
+
+Aula #4 - 04 de setembro de 2024
+Atividade
+Preencher as Tabelas ENTREGA, COMPRA e debitar no ESTOQUE
+Para preencher a tabela ENTREGA, você precisa analisar os pedidos, multiplicar a quantidade de cada produto pelo valor unitário e somar o valor total de cada pedido. Utilize um CURSOR para fazer isso e ordene a tabela ENTREGA do maior valor total para o menor.
+Depois de preencher a tabela ENTREGA e conforme os produtos forem entregues, você deve debitar a quantidade dos produtos da tabela produtos. Quando o estoque de um produto acabar, adicione esse produto à tabela COMPRA para indicar que ele precisa ser reposto no estoque.
+Passos:
+Calcular o Valor Total pelo Pedido: Multiplique a quantidade de cada item pelo seu valor unitário e some o total dos itens de cada pedido.
+Ordenar pelo Maior Valor: Ordene os pedidos na tabela ENTREGA do maior valor total para o menor utilizando ORDER BY valorTotal DESC.
+Tabelas Necessárias no Banco de Dados:
+Tabela de Pedido: Pode incluir campos como codigoPedido, dataPedido, codigoComprador, status, entre outros.
+Tabela de Compra: Para registrar os produtos que precisam ser comprados para repor o estoque.
+Tabela de Entrega: Para registrar as entregas feitas.
+Tabela de Estoque: Para controlar a quantidade disponível de cada produto.
+Tabela de Cliente: Para armazenar informações dos clientes.
+Tabela de Itens do Pedido: Para registrar os itens individuais de cada pedido.
+Tabela de TempData: Para carregar e manipular dados temporários.
+Tabela de Produtos: Para armazenar informações sobre os produtos.
+Observações Adicionais:
+SKU: Código do produto.
+UPC: Código do produto (Brasil).
+
+
+
+
+
+
+
