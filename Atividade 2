@@ -3,7 +3,7 @@ Atividade 2
 Para atividade 2 a criação das tabelas de Entrega e Compra.
 
 CREATE TABLE wl_entrega (
-    idPedido INT,
+    idPedido VARCHAR(255),
     totalPedido DECIMAL(9,2),
     email VARCHAR(100),
     codigoComprador INT,
