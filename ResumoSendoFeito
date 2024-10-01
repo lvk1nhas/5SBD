@@ -1,58 +1,9 @@
-FAETERJ-Rio
-5SBD - Scripts de Banco de Dados e SQL - 2024.2
-Professor: André Neves | Aluno: Lucas Oliveira
+5SBD - Scripts de Banco de Dados e SQL
+Professor: André Neves
+Aluno: Lucas Oliveira
 
 
-
-Aula #3 - 28 de agosto de 2024
-Inserção de dados por meio de um arquivo CSV (colunas separadas por vírgula) para o banco de dados.
-
-Comandos SQL
-
-Importação de dados por arquivo CSV:
-
-Comando: SQL pra importação dos dados em arquivo CSV:
-
-LOAD DATA INFILE 'C:/Users/casol/Downloads/produtos.csv'
-INTO TABLE wl_produtos
-FIELDS TERMINATED BY ',' 
-OPTIONALLY ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-(id, codigo, nome, valor, quantidade);
-
-
-Descrição do comando:
-Carregando conteúdo dentro do arquivo [produtos.csv]
-para dentro da tabela [sbd_produtos]
-com campos terminados em [vírgula], encapsulados por [aspas] e linhas terminando em [quebra de linha]
-para as colunas [id, código, nome, preço e quantidade].
-
-
-Comando: Inserindo dados do TXT no banco
-LOAD DATA INFILE 'C:/Users/casol/Downloads/pedidos.txt'
-INTO TABLE wl_tempdata
-FIELDS TERMINATED BY ';' 
-ENCLOSED BY '"' 
-LINES TERMINATED BY '\n'
-(codigoPedido, dataPedido, SKU, UPC, nomeProduto, quantidade, valor, frete, email, codigoComprador, nomeComprador, endereco, CEP, UF, pais);
-
-Descrição do comando:
-Carregando conteúdo dentro do arquivo [produtos.csv]
-para dentro da tabela [sbd_tempdata]
-com campos terminados em [ponto e vírgula], encapsulados por [aspas] e linhas terminando em [quebra de linha]
-para as colunas [codigoPedido, dataPedido, SKU, UPC, nomeProduto, qtd, valor, frete, email, codigoComprador, nomeComprador, endereco, CEP, UF e pais].
-
-
-Comando: Selecionar clientes sem repetição
-SELECT DISTINCT codigoComprador, email, endereco, CEP, UF, pais FROM wl_tempdata GROUP BY codigoComprador;
-
-
-Descrição do comando:
-Selecionar distintamente [codigoComprador, email, endereco, CEP, UF, pais] da tabela [sbd_tempdata], agrupando a consulta em [codigoComprador].
-
-
-
-ATIVIDADE
+ATIVIDADE 1
 
 Passo-a-passo (segundo o professor):
 
@@ -60,6 +11,8 @@ Com os dados armazenados no arquivo TXT,
 Criar uma tabela temporária
 Incluir na tabela temporária
 Criar a tabela Cliente
+Criar a tabela Produtos 
+Criar a tabela Estoque
 Criar a tabela Pedido
 Criar a tabela de Item do Pedido
 Inserir os dados
@@ -191,6 +144,9 @@ JOIN wl_produtos ON wl_tempdata.SKU = wl_produtos.SKU;
 
 DROP TABLE TEMPDATA;
 
+FIM DA ATIVIDADE 1 
+
+-----------------------------------------------------------------------
 
 
 Atividade preenchendo as tabelas
