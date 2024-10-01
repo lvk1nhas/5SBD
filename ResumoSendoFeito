@@ -34,6 +34,14 @@ LINES TERMINATED BY '\n'
 (codigoPedido, dataPedido, SKU, UPC, nomeProduto, quantidade, valor, frete, email, codigoComprador, nomeComprador, endereco, CEP, UF, pais);
 
 
+Comando: Selecionar clientes sem repetição
+SELECT DISTINCT codigoComprador, email, endereco, CEP, UF, pais FROM wl_tempdata GROUP BY codigoComprador;
+
+Descrição do comando:
+Selecionar distintamente [codigoComprador, email, endereco, CEP, UF, pais] da tabela [wl_tempdata], agrupando a consulta em [codigoComprador].
+
+
+
 2. Criar a Tabela Cliente
 
 CREATE TABLE wl_clientes (
