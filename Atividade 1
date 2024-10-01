@@ -116,3 +116,11 @@ DROP TABLE TEMPDATA;
 FIM DA ATIVIDADE 1 
 
 -----------------------------------------------------------------------
+
+-- Código para fazer upload de dados para uma tabela
+LOAD DATA INFILE 'C:/Users/natal/Downloads/Produtos.csv' INTO TABLE lojao
+FIELDS TERMINATED BY ',' ENCLOSED BY '"' 
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(codigo, nome, valor, qnt);
+
