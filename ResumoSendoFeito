@@ -3,7 +3,10 @@ Professor: André Neves
 Aluno: Lucas Oliveira
 
 
-Resposta da atividade 1
+
+Verifique se minhas atividades estão corretas, sao duas atividades.
+
+atividade 1: Resposta da atividade 1
 
 1. Criar a Tabela Temporária
 
@@ -46,13 +49,13 @@ Selecionar distintamente [codigoComprador, email, endereco, CEP, UF, pais] da ta
 
 CREATE TABLE wl_clientes (
     idCliente INT AUTO_INCREMENT PRIMARY KEY,
-    nomeComprador TEXT(255),
+    nomeComprador VARCHAR(255),
     email VARCHAR(255),
-    codigoComprador VARCHAR(255),
+    codigoComprador VARCHAR(255) UNIQUE,
     endereco VARCHAR(255),
     CEP VARCHAR(10),
     UF CHAR(2),
-    pais VARCHAR(50),
+    pais VARCHAR(50)
 );
 
 3. Criar a Tabela Produtos 
@@ -76,16 +79,17 @@ CREATE TABLE wl_estoque (
 5. Criar a Tabela Pedido
 
 CREATE TABLE wl_pedidos (
-    codigoPedido VARCHAR(255),
+    codigoPedido VARCHAR(255) PRIMARY KEY,
     dataPedido DATE,
+    status ENUM('pendente', 'entregue', 'cancelado', 'em andamento'),
     codigoComprador VARCHAR(255),
-    PRIMARY KEY (codigoPedido),
     FOREIGN KEY (codigoComprador) REFERENCES wl_clientes(codigoComprador)
 );
 
+
 6. Criar a Tabela Item do Pedido
 
-CREATE TABLE wl_ItemPedido (
+CREATE TABLE wl_itemPedido (
     id INT AUTO_INCREMENT PRIMARY KEY,
     codigoPedido VARCHAR(255),
     SKU VARCHAR(255),
@@ -139,111 +143,128 @@ Explicação sem group by: O DISTINCT já garante que as combinações de codigo
 INSERT INTO wl_ItemPedido (codigoPedido, SKU, UPC, nomeProduto, quantidade, valor, frete) SELECT codigoPedido, SKU, UPC, nomeProduto, quantidade, valor, frete FROM wl_tempdata JOIN wl_pedidos ON wl_tempdata.codigoPedido = wl_pedidos.codigoPedido
 JOIN wl_produtos ON wl_tempdata.SKU = wl_produtos.SKU;
 
-DROP TABLE TEMPDATA;
+DROP TEMPORARY TABLE wl_tempdata;
 
 FIM DA ATIVIDADE 1 
 
 -----------------------------------------------------------------------
 
+atividade 2: Atividade 2
+
+Para atividade 2 a criação das tabelas de Entrega e Compra.
+
+CREATE TABLE wl_entrega (
+    idPedido VARCHAR(255),
+    totalPedido DECIMAL(9,2),
+    email VARCHAR(100),
+    codigoComprador VARCHAR(255),
+    nomeComprador VARCHAR(100),
+    endereco VARCHAR(200),
+    cep VARCHAR(20),
+    uf VARCHAR(2),
+    pais VARCHAR(50),
+    PRIMARY KEY (idPedido),
+    FOREIGN KEY (idPedido) REFERENCES wl_pedidos(codigoPedido)
+);
+
+CREATE TABLE wl_compra (
+    sku VARCHAR(15),
+    nomeProduto VARCHAR(100),
+    quantidadeNecessaria INT,
+    PRIMARY KEY (sku)
+);
 
 
-Atividade preenchendo as tabelas
+----------------------------------------
 
-[Gerar um arquivo CSV (com ajuda de uma Inteligência Artificial) preenchendo os campos codigoPedido;dataPedido;SKU;UPC;nomeProduto;qtd;valor;frete;email;codigoComprador;nomeComprador;endereco;CEP;UF;pais]
+DECLARE @idPedido VARCHAR(255),  
+        @qtd INT, 
+        @sku VARCHAR(50), 
+        @upc VARCHAR(50), 
+        @nomeProduto VARCHAR(50), 
+        @valor DECIMAL(9,2), 
+        @frete DECIMAL(9,2), 
+        @email VARCHAR(100), 
+        @codigoComprador VARCHAR(255),  
+        @nomeComprador VARCHAR(100), 
+        @endereco VARCHAR(200), 
+        @cep VARCHAR(20), 
+        @uf VARCHAR(2), 
+        @pais VARCHAR(50),
+        @totalPedido DECIMAL(9,2),
+        @estoqueAtual INT,
+        @totalEntrega DECIMAL(9,2);
 
-Inserindo os dados na tabela wl_tempdata:
+-- Início do cursor
+DECLARE pedidoCursor CURSOR FOR 
+    SELECT p.codigoPedido, pi.SKU, pi.UPC, pi.nomeProduto, pi.quantidade, pi.valor, p.frete, 
+           p.email, p.codigoComprador, p.nomeComprador, p.endereco, p.CEP, p.UF, p.pais
+    FROM wl_pedidos p 
+    INNER JOIN wl_itemPedido pi ON pi.codigoPedido = p.codigoPedido  
+    WHERE p.status = 'pendente'  -- Adicionar a coluna status à tabela wl_pedidos
+    ORDER BY pi.valor * pi.quantidade DESC;  -- Ordena pelo valor total do pedido
 
-LOAD DATA INFILE 'C:/Users/casol/downloads/pedidosgpt.csv'
-INTO TABLE wl_tempdata
-FIELDS TERMINATED BY ';' ENCLOSED BY '"' LINES TERMINATED BY '\n'
-(codigoPedido, dataPedido, SKU, UPC, nomeProduto, quantidade, valor, frete, email, codigoComprador, nomeComprador, endereco, CEP, UF, pais);
+OPEN pedidoCursor;
 
+FETCH NEXT FROM pedidoCursor INTO @idPedido, @sku, @upc, @nomeProduto, @qtd, @valor, @frete, 
+                                @email, @codigoComprador, @nomeComprador, @endereco, @cep, @uf, @pais;
 
+-- Inicia o processamento dos pedidos
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    -- Calcula o valor total do pedido (quantidade * valor)
+    SET @totalPedido = @qtd * @valor + @frete;
+    
+    -- Atualiza a tabela wl_entrega
+    INSERT INTO wl_entrega (idPedido, totalPedido, email, codigoComprador, nomeComprador, endereco, cep, uf, pais)
+    VALUES (@idPedido, @totalPedido, @email, @codigoComprador, @nomeComprador, @endereco, @cep, @uf, @pais);
 
+    -- Verifica o estoque atual do produto
+    SELECT @estoqueAtual = quantidade FROM wl_estoque WHERE SKU = @sku;
+    
+    -- Se houver estoque suficiente, debita o produto
+    IF @estoqueAtual >= @qtd
+    BEGIN
+        UPDATE wl_estoque
+        SET quantidade = quantidade - @qtd
+        WHERE SKU = @sku;
+        
+        -- Calcula o valor da entrega
+        SET @totalEntrega = @qtd * @valor;
+        
+        -- Registra a entrega
+        PRINT('Pedido entregue: ' + CAST(@idPedido AS VARCHAR) + ', Produto: ' + @nomeProduto + ', Quantidade: ' + CAST(@qtd AS VARCHAR));
+    END
+    ELSE
+    BEGIN
+        -- Se não houver estoque suficiente, insere o produto na tabela wl_compra
+        INSERT INTO wl_compra (sku, nomeProduto, quantidadeNecessaria)
+        VALUES (@sku, @nomeProduto, @qtd - @estoqueAtual);
+        
+        -- Atualiza o estoque para zero
+        UPDATE wl_estoque
+        SET quantidade = 0
+        WHERE SKU = @sku;
+        
+        -- Calcula a entrega parcial (se houver algum estoque)
+        IF @estoqueAtual > 0
+        BEGIN
+            SET @totalEntrega = @estoqueAtual * @valor;
+            
+            PRINT('Entrega parcial: Pedido ' + CAST(@idPedido AS VARCHAR) + ', Produto: ' + @nomeProduto + ', Quantidade entregue: ' + CAST(@estoqueAtual AS VARCHAR));
+        END
+        
+        PRINT('Produto em falta: ' + @nomeProduto + ' será comprado. Quantidade necessária: ' + CAST(@qtd - @estoqueAtual AS VARCHAR));
+    END
 
+    -- Buscar o próximo pedido
+    FETCH NEXT FROM pedidoCursor INTO @idPedido, @sku, @upc, @nomeProduto, @qtd, @valor, @frete, 
+                                    @email, @codigoComprador, @nomeComprador, @endereco, @cep, @uf, @pais;
+END
 
-
-—
-
-
-
-
-
-Comando SQL para Inserir Clientes:
-INSERT INTO wl_clientes (codigoComprador, nomeComprador, email, endereco, CEP, UF, pais) 
-SELECT DISTINCT codigoComprador, nomeComprador, email, endereco, CEP, UF, pais FROM wl_tempdata GROUP BY email;
-
-
-
-Comando SQL para Inserir Compras:
-INSERT INTO wl_compras (codigoPedido, valor, frete)
-SELECT DISTINCT codigoPedido, valor, frete
-FROM wl_tempdata;
-
-
-
-
-Comando SQL para Inserir Entregas: 
-INSERT INTO wl_entregas (codigoPedido, endereco, CEP, UF, pais)
-SELECT DISTINCT codigoPedido, endereco, CEP, UF, pais
-FROM wl_tempdata;
-
-
-
-
-Comando SQL para Inserir no Estoque:
-INSERT INTO wl_estoque (SKU, quantidade)
-SELECT DISTINCT SKU, SUM(quantidade) AS quantidade
-FROM wl_tempdata
-GROUP BY SKU;
-
-
-
-
-
-Comando SQL para Inserir ItemPedido:
-INSERT INTO wl_itempedido (codigoPedido, SKU, UPC, nomeProduto, quantidade, valor)
-SELECT codigoPedido, SKU, UPC, nomeProduto, quantidade, valor
-FROM wl_tempdata;
-
-
-
-
-Comando SQL para Inserir Pedidos:
-INSERT INTO wl_pedidos (codigoPedido, dataPedido, codigoComprador) SELECT DISTINCT codigoPedido, dataPedido, codigoComprador FROM wl_tempdata;
-
-
-Comando SQL para Inserir Produtos:
-INSERT INTO wl_produtos (SKU, UPC, nomeProduto, valor)
-SELECT DISTINCT SKU, UPC, nomeProduto, valor
-FROM wl_tempdata
-WHERE SKU NOT IN (SELECT DISTINCT SKU FROM wl_produtos);
-
-
-
-
-
-
-Aula #4 - 04 de setembro de 2024
-Atividade
-Preencher as Tabelas ENTREGA, COMPRA e debitar no ESTOQUE
-Para preencher a tabela ENTREGA, você precisa analisar os pedidos, multiplicar a quantidade de cada produto pelo valor unitário e somar o valor total de cada pedido. Utilize um CURSOR para fazer isso e ordene a tabela ENTREGA do maior valor total para o menor.
-Depois de preencher a tabela ENTREGA e conforme os produtos forem entregues, você deve debitar a quantidade dos produtos da tabela produtos. Quando o estoque de um produto acabar, adicione esse produto à tabela COMPRA para indicar que ele precisa ser reposto no estoque.
-Passos:
-Calcular o Valor Total pelo Pedido: Multiplique a quantidade de cada item pelo seu valor unitário e some o total dos itens de cada pedido.
-Ordenar pelo Maior Valor: Ordene os pedidos na tabela ENTREGA do maior valor total para o menor utilizando ORDER BY valorTotal DESC.
-Tabelas Necessárias no Banco de Dados:
-Tabela de Pedido: Pode incluir campos como codigoPedido, dataPedido, codigoComprador, status, entre outros.
-Tabela de Compra: Para registrar os produtos que precisam ser comprados para repor o estoque.
-Tabela de Entrega: Para registrar as entregas feitas.
-Tabela de Estoque: Para controlar a quantidade disponível de cada produto.
-Tabela de Cliente: Para armazenar informações dos clientes.
-Tabela de Itens do Pedido: Para registrar os itens individuais de cada pedido.
-Tabela de TempData: Para carregar e manipular dados temporários.
-Tabela de Produtos: Para armazenar informações sobre os produtos.
-Observações Adicionais:
-SKU: Código do produto.
-UPC: Código do produto (Brasil).
+-- Fechar e desalocar o cursor
+CLOSE pedidoCursor;
+DEALLOCATE pedidoCursor;
 
 
 
