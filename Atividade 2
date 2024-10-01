@@ -13,7 +13,7 @@ CREATE TABLE wl_entrega (
     uf VARCHAR(2),
     pais VARCHAR(50),
     PRIMARY KEY (idPedido),
-    FOREIGN KEY (idPedido) REFERENCES Pedidos(idPedido)
+    FOREIGN KEY (idPedido) REFERENCES wl_pedidos(idPedido)
 );
 
 CREATE TABLE wl_compra (
