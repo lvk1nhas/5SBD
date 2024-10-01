@@ -17,7 +17,7 @@ CREATE TABLE wl_entrega (
 );
 
 CREATE TABLE wl_compra (
-    sku VARCHAR(50),
+    sku VARCHAR(15),
     nomeProduto VARCHAR(100),
     quantidadeNecessaria INT,
     PRIMARY KEY (sku)
