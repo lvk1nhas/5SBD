@@ -71,13 +71,13 @@ CREATE TABLE wl_estoque (
 5. Criar a Tabela Pedido
 
 CREATE TABLE wl_pedidos (
-    codigoPedido VARCHAR(255),
+    codigoPedido VARCHAR(255) PRIMARY KEY,
     dataPedido DATE,
     status ENUM('pendente', 'entregue', 'cancelado', 'em andamento'),
     codigoComprador VARCHAR(255),
-    PRIMARY KEY (codigoPedido),
     FOREIGN KEY (codigoComprador) REFERENCES wl_clientes(codigoComprador)
 );
+
 
 6. Criar a Tabela Item do Pedido
 
