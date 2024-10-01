@@ -52,7 +52,9 @@ CREATE TABLE wl_produtos (
     valor DECIMAL(10, 2)
 );
 
-4. CREATE TABLE wl_estoque (
+4. Criar a Tabela Estoque
+
+CREATE TABLE wl_estoque (
     idEstoque INT AUTO_INCREMENT PRIMARY KEY,
     SKU VARCHAR(15) UNIQUE,
     quantidade INT
