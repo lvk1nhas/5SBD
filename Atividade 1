@@ -80,7 +80,7 @@ CREATE TABLE wl_pedidos (
 
 6. Criar a Tabela Item do Pedido
 
-CREATE TABLE wl_ItemPedido (
+CREATE TABLE wl_itemPedido (
     id INT AUTO_INCREMENT PRIMARY KEY,
     codigoPedido VARCHAR(255),
     SKU VARCHAR(255),
