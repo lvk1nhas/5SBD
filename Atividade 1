@@ -94,6 +94,21 @@ INSERT INTO wl_clientes (nomeComprador, email, codigoComprador, endereco, CEP, U
 
 2. Inserir Dados na Tabela Produtos:
 
+Comando: SQL pra importação dos dados em arquivo CSV:
+
+LOAD DATA INFILE 'C:/Users/casol/Downloads/produtos.csv'
+INTO TABLE wl_produtos FIELDS TERMINATED BY ','  OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' (SKU, UPC, nomeProduto, valor);
+
+Descrição do comando:
+Carregando conteúdo dentro do arquivo [produtos.csv]
+para dentro da tabela [wl_produtos]
+com campos terminados em [vírgula], encapsulados por [aspas] e linhas terminando em [quebra de linha]
+para as colunas [SKU, UPC, nomeProduto, valor].
+
+ou 
+
+Inserir direto da tabela wl_tempdata
+
 INSERT INTO wl_produtos (SKU, UPC, nomeProduto, valor) SELECT DISTINCT SKU, UPC, nomeProduto, valor FROM wl_tempdata;
 
 3. Inserir Dados na Tabela Estoque:
@@ -117,10 +132,4 @@ FIM DA ATIVIDADE 1
 
 -----------------------------------------------------------------------
 
--- Código para fazer upload de dados para uma tabela
-LOAD DATA INFILE 'C:/Users/natal/Downloads/Produtos.csv' INTO TABLE lojao
-FIELDS TERMINATED BY ',' ENCLOSED BY '"' 
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES
-(codigo, nome, valor, qnt);
 
