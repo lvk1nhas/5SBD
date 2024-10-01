@@ -43,7 +43,7 @@ CREATE TABLE wl_clientes (
     idCliente INT AUTO_INCREMENT PRIMARY KEY,
     nomeComprador VARCHAR(255),
     email VARCHAR(255),
-    codigoComprador VARCHAR(255),
+    codigoComprador VARCHAR(255) UNIQUE,
     endereco VARCHAR(255),
     CEP VARCHAR(10),
     UF CHAR(2),
