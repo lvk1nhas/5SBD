@@ -3,34 +3,6 @@ Professor: André Neves
 Aluno: Lucas Oliveira
 
 
-ATIVIDADE 1
-
-Passo-a-passo (segundo o professor):
-
-Com os dados armazenados no arquivo TXT,
-Criar uma tabela temporária
-Incluir na tabela temporária
-Criar a tabela Cliente
-Criar a tabela Produtos 
-Criar a tabela Estoque
-Criar a tabela Pedido
-Criar a tabela de Item do Pedido
-Inserir os dados
-
-Observações:
-PEDIDOS: identificar pelo código do comprador
-linha para cada produto que o cliente comprou (não significa que são dois pedidos)
-
-
-Campos da tabela Cliente:
-email
-codigoComprador
-endereco
-CEP
-UF
-pais
-
-
 Resposta da atividade 1
 
 1. Criar a Tabela Temporária
@@ -85,7 +57,9 @@ CREATE TABLE wl_produtos (
     valor DECIMAL(10, 2)
 );
 
-4. CREATE TABLE wl_estoque (
+4. Criar a Tabela Estoque
+
+CREATE TABLE wl_estoque (
     idEstoque INT AUTO_INCREMENT PRIMARY KEY,
     SKU VARCHAR(15) UNIQUE,
     quantidade INT
@@ -125,6 +99,21 @@ INSERT INTO wl_clientes (nomeComprador, email, codigoComprador, endereco, CEP, U
 
 2. Inserir Dados na Tabela Produtos:
 
+Comando: SQL pra importação dos dados em arquivo CSV:
+
+LOAD DATA INFILE 'C:/Users/casol/Downloads/produtos.csv'
+INTO TABLE wl_produtos FIELDS TERMINATED BY ','  OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' (SKU, UPC, nomeProduto, valor);
+
+Descrição do comando:
+Carregando conteúdo dentro do arquivo [produtos.csv]
+para dentro da tabela [wl_produtos]
+com campos terminados em [vírgula], encapsulados por [aspas] e linhas terminando em [quebra de linha]
+para as colunas [SKU, UPC, nomeProduto, valor].
+
+ou 
+
+Inserir direto da tabela wl_tempdata
+
 INSERT INTO wl_produtos (SKU, UPC, nomeProduto, valor) SELECT DISTINCT SKU, UPC, nomeProduto, valor FROM wl_tempdata;
 
 3. Inserir Dados na Tabela Estoque:
@@ -147,6 +136,7 @@ DROP TABLE TEMPDATA;
 FIM DA ATIVIDADE 1 
 
 -----------------------------------------------------------------------
+
 
 
 Atividade preenchendo as tabelas
