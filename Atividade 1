@@ -41,7 +41,7 @@ Selecionar distintamente [codigoComprador, email, endereco, CEP, UF, pais] da ta
 
 CREATE TABLE wl_clientes (
     idCliente INT AUTO_INCREMENT PRIMARY KEY,
-    nomeComprador TEXT(255),
+    nomeComprador VARCHAR(255),
     email VARCHAR(255),
     codigoComprador VARCHAR(255),
     endereco VARCHAR(255),
@@ -134,7 +134,7 @@ Explicação sem group by: O DISTINCT já garante que as combinações de codigo
 INSERT INTO wl_ItemPedido (codigoPedido, SKU, UPC, nomeProduto, quantidade, valor, frete) SELECT codigoPedido, SKU, UPC, nomeProduto, quantidade, valor, frete FROM wl_tempdata JOIN wl_pedidos ON wl_tempdata.codigoPedido = wl_pedidos.codigoPedido
 JOIN wl_produtos ON wl_tempdata.SKU = wl_produtos.SKU;
 
-DROP TABLE TEMPDATA;
+DROP TEMPORARY TABLE wl_tempdata;
 
 FIM DA ATIVIDADE 1 
 
