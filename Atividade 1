@@ -47,7 +47,7 @@ CREATE TABLE wl_clientes (
     endereco VARCHAR(255),
     CEP VARCHAR(10),
     UF CHAR(2),
-    pais VARCHAR(50),
+    pais VARCHAR(50)
 );
 
 3. Criar a Tabela Produtos 
