@@ -1,28 +1,119 @@
 Atividade 2
 
-Preencha a tabela ENTREGA, COMPRA e debitar de ESTOQUE
+Para atividade 2 a criação das tabelas de Entrega e Compra.
 
-Segundo o professor, para preencher a tabela ENTREGA, você vai precisar analisar o pedido, multiplicando o produto pela quantidade pedida e somando o valor de cada item pedido (usando CURSOR).  
-Em seguida ordenará a tabela ENTREGA do maior pedido total pro menor pedido total. 
-Conforme as entregas forem acontecendo, debite os produtos da tabela produtos e quando adcabar o estoque passe esse produto pra tabela “compras” porque é o que precisa ser comprado para preencher o estoque.
+CREATE TABLE ENTREGA (
+    idPedido INT,
+    totalPedido DECIMAL(9,2),
+    email VARCHAR(100),
+    codigoComprador INT,
+    nomeComprador VARCHAR(100),
+    endereco VARCHAR(200),
+    cep VARCHAR(20),
+    uf VARCHAR(2),
+    pais VARCHAR(50),
+    PRIMARY KEY (idPedido),
+    FOREIGN KEY (idPedido) REFERENCES Pedidos(idPedido)
+);
+
+CREATE TABLE COMPRA (
+    sku VARCHAR(50),
+    nomeProduto VARCHAR(100),
+    quantidadeNecessaria INT,
+    PRIMARY KEY (sku)
+);
+
+----------------------------------------
+
+Cursor
+
+DECLARE @idPedido int,
+        @qtd int, 
+        @sku varchar(50), 
+        @upc varchar(50), 
+        @nomeProduto varchar(50), 
+        @valor decimal(9,2), 
+        @frete decimal(9,2), 
+        @email varchar(100), 
+        @codigoComprador int, 
+        @nomeComprador varchar(100), 
+        @endereco varchar(200), 
+        @cep varchar(20), 
+        @uf varchar(2), 
+        @pais varchar(50),
+        @totalPedido decimal(9,2),
+        @estoqueAtual int,
+        @totalEntrega decimal(9,2);
+
+--inicio cursor
+DECLARE pedidoCursor CURSOR FOR 
+    SELECT p.idPedido, pi.sku, pi.upc, pi.nomeProduto, pi.qtd, pi.valor, p.frete, p.email, p.codigoComprador, 
+           p.nomeComprador, p.endereco, p.cep, p.uf, p.pais
+    FROM Pedidos p
+    INNER JOIN PedidosItens pi ON pi.idPedido = p.idPedido
+    WHERE p.status = 'pendente'
+    ORDER BY pi.valor * pi.qtd DESC;  -- Ordena pelo valor total do pedido
+
+OPEN pedidoCursor;
+
+FETCH NEXT FROM pedidoCursor INTO @idPedido, @sku, @upc, @nomeProduto, @qtd, @valor, @frete, 
+                                @email, @codigoComprador, @nomeComprador, @endereco, @cep, @uf, @pais;
+
+-- Inicia o processamento dos pedidos
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    -- Calcula o valor total do pedido (quantidade * valor)
+    SET @totalPedido = @qtd * @valor + @frete;
+    
+    -- Atualiza a tabela ENTREGA
+    INSERT INTO ENTREGA (idPedido, totalPedido, email, codigoComprador, nomeComprador, endereco, cep, uf, pais)
+    VALUES (@idPedido, @totalPedido, @email, @codigoComprador, @nomeComprador, @endereco, @cep, @uf, @pais);
+
+    -- Verifica o estoque atual do produto
+    SELECT @estoqueAtual = quantidade FROM Estoque WHERE sku = @sku;
+    
+    -- Se houver estoque suficiente, debita o produto
+    IF @estoqueAtual >= @qtd
+    BEGIN
+        UPDATE Estoque
+        SET quantidade = quantidade - @qtd
+        WHERE sku = @sku;
+        
+        -- Calcula o valor da entrega
+        SET @totalEntrega = @qtd * @valor;
+        
+        -- Registra a entrega
+        PRINT('Pedido entregue: ' + CAST(@idPedido AS varchar) + ', Produto: ' + @nomeProduto + ', Quantidade: ' + CAST(@qtd AS varchar));
+    END
+    ELSE
+    BEGIN
+        -- Se não houver estoque suficiente, insere o produto na tabela COMPRA
+        INSERT INTO COMPRA (sku, nomeProduto, quantidadeNecessaria)
+        VALUES (@sku, @nomeProduto, @qtd - @estoqueAtual);
+        
+        -- Atualiza o estoque para zero
+        UPDATE Estoque
+        SET quantidade = 0
+        WHERE sku = @sku;
+        
+        -- Calcula a entrega parcial (se houver algum estoque)
+        IF @estoqueAtual > 0
+        BEGIN
+            SET @totalEntrega = @estoqueAtual * @valor;
+            
+            PRINT('Entrega parcial: Pedido ' + CAST(@idPedido AS varchar) + ', Produto: ' + @nomeProduto + ', Quantidade entregue: ' + CAST(@estoqueAtual AS varchar));
+        END
+        
+        PRINT('Produto em falta: ' + @nomeProduto + ' será comprado. Quantidade necessária: ' + CAST(@qtd - @estoqueAtual AS varchar));
+    END
+
+    -- Buscar o próximo pedido
+    FETCH NEXT FROM pedidoCursor INTO @idPedido, @sku, @upc, @nomeProduto, @qtd, @valor, @frete, 
+                                    @email, @codigoComprador, @nomeComprador, @endereco, @cep, @uf, @pais;
+END
+
+-- Fechar e desalocar o cursor
+CLOSE pedidoCursor;
+DEALLOCATE pedidoCursor;
 
 
-Calcular o valor total pelo pedido
-Ordenar pelo maior valor (ORDER BY valorTotal DESC)
-
-Tabelas:
-Tabela de pedido
-status? quando o status for “pendente”, deve-se fazer todo o procedimento (André falou)
-Tabela de compra
-Tabela de entrega
-Tabela de estoque
-Tabela de cliente
-Tabela de itens do pedido
-Tabela de dadostemp (carregar conteúdo)
-Tabela de produtos
-
-
-SKU - código pra produto (outros)
-UPC - código pra produto (brasil)
-
-Utilizar SQL SERVER DEVELOPER, escolha do professor
