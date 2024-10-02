@@ -91,11 +91,13 @@ CREATE TABLE wl_entregas (
 -- 9. Criar a Tabela Compra
 CREATE TABLE wl_compra (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    SKU VARCHAR(15) NOT NULL,
+    SKU VARCHAR(255) NOT NULL,
     quantidade INT NOT NULL,
-    INDEX (SKU),
-    FOREIGN KEY (SKU) REFERENCES wl_produtos(SKU)
+    valor DECIMAL(10, 2),
+    data_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (SKU)  -- Definindo SKU como chave única
 );
+
 
 -----------------------------------------------------------------------
 
