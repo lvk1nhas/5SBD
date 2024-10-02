@@ -58,6 +58,8 @@ CREATE TABLE wl_estoque (
 CREATE TABLE wl_pedidos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     codigoPedido VARCHAR(255) UNIQUE NOT NULL,
+    valor DECIMAL(10, 2),
+    codigoComprador VARCHAR(255),
     dataPedido DATE NOT NULL,
     status ENUM('pendente', 'entregue', 'cancelado', 'em andamento') NOT NULL
 );
