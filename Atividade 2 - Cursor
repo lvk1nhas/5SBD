@@ -68,3 +68,51 @@ BEGIN
 END //
 
 DELIMITER ;
+
+----------
+
+--RenovarEstoque
+DELIMITER //
+
+CREATE PROCEDURE RenovarEstoque()
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE v_SKU VARCHAR(255);
+    DECLARE v_quantidade INT;
+
+    -- Declare the cursor
+    DECLARE estoque_cursor CURSOR FOR 
+        SELECT SKU, SUM(quantidade) AS total_quantidade
+        FROM wl_tempdata
+        GROUP BY SKU;
+
+    -- Declare a continue handler for when there are no more rows
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    -- Open the cursor
+    OPEN estoque_cursor;
+
+    -- Start looping through the cursor
+    read_loop: LOOP
+        FETCH estoque_cursor INTO v_SKU, v_quantidade;
+        
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Verifica se o estoque está zerado
+        IF (SELECT quantidade FROM wl_estoque WHERE SKU = v_SKU) = 0 THEN
+            -- Atualiza o estoque com a nova quantidade
+            INSERT INTO wl_estoque (SKU, quantidade) 
+            VALUES (v_SKU, v_quantidade)
+            ON DUPLICATE KEY UPDATE quantidade = quantidade + v_quantidade;
+        END IF;
+
+    END LOOP;
+
+    -- Fechar o cursor
+    CLOSE estoque_cursor;
+END //
+
+DELIMITER ;
+
