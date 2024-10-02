@@ -108,6 +108,16 @@ FROM wl_tempdata
 GROUP BY codigoComprador;
 
 -- 2. Inserir Dados na Tabela Produtos:
+
+-- Comando: SQL pra importação dos dados em arquivo CSV:
+LOAD DATA INFILE 'C:/Users/casol/Downloads/produtos.csv'
+INTO TABLE wl_produtos 
+FIELDS TERMINATED BY ',' 
+OPTIONALLY ENCLOSED BY '"' 
+LINES TERMINATED BY '\n' 
+(SKU, UPC, nomeProduto, valor);
+
+-- Ou inserir diretamente da tabela wl_tempdata
 INSERT INTO wl_produtos (SKU, UPC, nomeProduto, valor)
 SELECT DISTINCT SKU, UPC, nomeProduto, valor
 FROM wl_tempdata;
