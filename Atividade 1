@@ -135,7 +135,12 @@ GROUP BY SKU;
 
 -- 4. Inserir Dados na Tabela Pedidos:
 INSERT INTO wl_pedidos (codigoPedido, codigoComprador, dataPedido, valor, status)
-SELECT DISTINCT codigoPedido, codigoComprador, dataPedido, valor, 'pendente'  AS status
+SELECT DISTINCT 
+    wl_tempdata.codigoPedido, 
+    wl_tempdata.codigoComprador, 
+    wl_tempdata.dataPedido, 
+    wl_tempdata.valor, 
+    'pendente' AS status
 FROM wl_tempdata
 JOIN wl_clientes ON wl_tempdata.codigoComprador = wl_clientes.codigoComprador;
 
