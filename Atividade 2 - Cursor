@@ -15,18 +15,18 @@ BEGIN
     DECLARE v_frete DECIMAL(10, 2);
     DECLARE v_estoque INT;
 
-    -- Declare the cursor
+    -- Declarar o cursor
     DECLARE pedido_cursor CURSOR FOR 
         SELECT codigoPedido, SKU, quantidade, valor, frete 
         FROM wl_tempdata;
     
-    -- Declare a continue handler for when there are no more rows
+    -- Handler que define o que acontece quando o cursor atinge o fim dos dados
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-    -- Open the cursor
+    -- Abrir o cursor
     OPEN pedido_cursor;
 
-    -- Start looping through the cursor
+    -- Começa o looping
     read_loop: LOOP
         FETCH pedido_cursor INTO v_codigoPedido, v_SKU, v_quantidade, v_valor, v_frete;
         
