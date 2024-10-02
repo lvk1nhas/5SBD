@@ -1,6 +1,4 @@
-Resposta da atividade 1
-
-1. Criar a Tabela Temporária
+-- 1. Criar a Tabela Temporária
 
 CREATE TEMPORARY TABLE wl_tempdata (
     codigoPedido VARCHAR(255),
@@ -20,7 +18,7 @@ CREATE TEMPORARY TABLE wl_tempdata (
     pais VARCHAR(50)
 );
 
-Comando: Inserindo dados do TXT no banco
+-- Comando: Inserindo dados do TXT no banco
 LOAD DATA INFILE 'C:/Users/casol/Downloads/pedidos.txt'
 INTO TABLE wl_tempdata
 FIELDS TERMINATED BY ';' 
@@ -29,15 +27,15 @@ LINES TERMINATED BY '\n'
 (codigoPedido, dataPedido, SKU, UPC, nomeProduto, quantidade, valor, frete, email, codigoComprador, nomeComprador, endereco, CEP, UF, pais);
 
 
-Comando: Selecionar clientes sem repetição
+-- Comando: Selecionar clientes sem repetição
 SELECT DISTINCT codigoComprador, email, endereco, CEP, UF, pais FROM wl_tempdata GROUP BY codigoComprador;
 
-Descrição do comando:
-Selecionar distintamente [codigoComprador, email, endereco, CEP, UF, pais] da tabela [wl_tempdata], agrupando a consulta em [codigoComprador].
+-- Descrição do comando:
+-- Selecionar distintamente [codigoComprador, email, endereco, CEP, UF, pais] da tabela [wl_tempdata], agrupando a consulta em [codigoComprador].
 
 
 
-2. Criar a Tabela Cliente
+-- 2. Criar a Tabela Cliente
 
 CREATE TABLE wl_clientes (
     idCliente INT AUTO_INCREMENT PRIMARY KEY,
@@ -50,7 +48,7 @@ CREATE TABLE wl_clientes (
     pais VARCHAR(50)
 );
 
-3. Criar a Tabela Produtos 
+-- 3. Criar a Tabela Produtos 
 
 CREATE TABLE wl_produtos (
     idProduto INT AUTO_INCREMENT PRIMARY KEY,
@@ -60,7 +58,7 @@ CREATE TABLE wl_produtos (
     valor DECIMAL(10, 2)
 );
 
-4. Criar a Tabela Estoque
+-- 4. Criar a Tabela Estoque
 
 CREATE TABLE wl_estoque (
     idEstoque INT AUTO_INCREMENT PRIMARY KEY,
@@ -68,7 +66,7 @@ CREATE TABLE wl_estoque (
     quantidade INT
 );
 
-5. Criar a Tabela Pedido
+-- 5. Criar a Tabela Pedido
 
 CREATE TABLE wl_pedidos (
     codigoPedido VARCHAR(255) PRIMARY KEY,
@@ -79,7 +77,7 @@ CREATE TABLE wl_pedidos (
 );
 
 
-6. Criar a Tabela Item do Pedido
+-- 6. Criar a Tabela Item do Pedido
 
 CREATE TABLE wl_itemPedido (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -95,50 +93,48 @@ CREATE TABLE wl_itemPedido (
 
 -----------------------------------------------------------------------
 
-Inserindo os Dados
+-- Inserindo os Dados
 
-1. Inserir Dados na Tabela Cliente:
+-- 1. Inserir Dados na Tabela Cliente:
 
 INSERT INTO wl_clientes (nomeComprador, email, codigoComprador, endereco, CEP, UF, pais) SELECT DISTINCT nomeComprador, email, codigoComprador, endereco, CEP, UF, pais FROM wl_tempdata GROUP BY codigoComprador;
 
-2. Inserir Dados na Tabela Produtos:
+-- 2. Inserir Dados na Tabela Produtos:
 
-Comando: SQL pra importação dos dados em arquivo CSV:
+-- Comando: SQL pra importação dos dados em arquivo CSV:
 
 LOAD DATA INFILE 'C:/Users/casol/Downloads/produtos.csv'
 INTO TABLE wl_produtos FIELDS TERMINATED BY ','  OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' (SKU, UPC, nomeProduto, valor);
 
-Descrição do comando:
-Carregando conteúdo dentro do arquivo [produtos.csv]
-para dentro da tabela [wl_produtos]
-com campos terminados em [vírgula], encapsulados por [aspas] e linhas terminando em [quebra de linha]
-para as colunas [SKU, UPC, nomeProduto, valor].
+-- Descrição do comando:
+-- Carregando conteúdo dentro do arquivo [produtos.csv]
+-- para dentro da tabela [wl_produtos]
+-- com campos terminados em [vírgula], encapsulados por [aspas] e linhas terminando em [quebra de linha]
+-- para as colunas [SKU, UPC, nomeProduto, valor].
 
-ou 
+-- ou 
 
-Inserir direto da tabela wl_tempdata
+-- Inserir direto da tabela wl_tempdata
 
 INSERT INTO wl_produtos (SKU, UPC, nomeProduto, valor) SELECT DISTINCT SKU, UPC, nomeProduto, valor FROM wl_tempdata;
 
-3. Inserir Dados na Tabela Estoque:
+-- 3. Inserir Dados na Tabela Estoque:
 
 INSERT INTO wl_estoque (SKU, quantidade) SELECT SKU, SUM(quantidade) AS quantidade FROM wl_tempdata GROUP BY SKU;
 
-4. Inserir Dados na Tabela Pedido:
+-- 4. Inserir Dados na Tabela Pedido:
 
 INSERT INTO wl_pedidos (codigoPedido, dataPedido, codigoComprador) SELECT DISTINCT codigoPedido, dataPedido, codigoComprador FROM wl_tempdata JOIN wl_clientes ON wl_tempdata.codigoComprador = wl_clientes.codigoComprador;
 
-Explicação sem group by: O DISTINCT já garante que as combinações de codigoPedido, dataPedido, e codigoComprador sejam únicas. Não é necessário agrupar por uma coluna específica porque o DISTINCT já lida com a eliminação de duplicatas.
+-- Explicação sem group by: O DISTINCT já garante que as combinações de codigoPedido, dataPedido, e codigoComprador sejam únicas. Não é necessário agrupar por uma coluna específica porque o DISTINCT já lida com a eliminação de duplicatas.
 
-5. Inserir Dados na Tabela ItemPedido:
+-- 5. Inserir Dados na Tabela ItemPedido:
 
 INSERT INTO wl_ItemPedido (codigoPedido, SKU, UPC, nomeProduto, quantidade, valor, frete) SELECT codigoPedido, SKU, UPC, nomeProduto, quantidade, valor, frete FROM wl_tempdata JOIN wl_pedidos ON wl_tempdata.codigoPedido = wl_pedidos.codigoPedido
 JOIN wl_produtos ON wl_tempdata.SKU = wl_produtos.SKU;
 
 DROP TEMPORARY TABLE wl_tempdata;
 
-FIM DA ATIVIDADE 1 
+-- FIM DA ATIVIDADE 1 
 
 -----------------------------------------------------------------------
-
-
