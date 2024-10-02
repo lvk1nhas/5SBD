@@ -64,6 +64,7 @@ CREATE TABLE wl_pedidos (
     status ENUM('pendente', 'entregue', 'cancelado', 'em andamento') NOT NULL
 );
 
+
 -- 7. Criar a Tabela Item do Pedido
 CREATE TABLE wl_itemPedido (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -133,10 +134,11 @@ FROM wl_tempdata
 GROUP BY SKU;
 
 -- 4. Inserir Dados na Tabela Pedidos:
-INSERT INTO wl_pedidos (codigoPedido, dataPedido, status)
-SELECT DISTINCT codigoPedido, dataPedido, 'pendente' AS status
+INSERT INTO wl_pedidos (codigoPedido, codigoComprador, dataPedido, valor, status)
+SELECT DISTINCT codigoPedido, codigoComprador, dataPedido, valor, 'pendente'  AS status
 FROM wl_tempdata
 JOIN wl_clientes ON wl_tempdata.codigoComprador = wl_clientes.codigoComprador;
+
 
 -- 5. Inserir Dados na Tabela ItemPedido:
 INSERT INTO wl_itemPedido (codigoPedido, SKU, quantidade, valor_unitario, status)
