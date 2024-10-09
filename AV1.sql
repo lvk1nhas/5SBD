@@ -25,7 +25,7 @@ DELIMITER $$
 --
 -- Procedimentos
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_InserirDados` ()   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `wl_InserirDados` ()   BEGIN
     -- 1. Inserindo novos clientes que ainda não estão na base
     INSERT INTO wl_clientes (codigoComprador, nomeComprador, email)
     SELECT DISTINCT codigoComprador, nomeComprador, email
@@ -222,21 +222,7 @@ CREATE TABLE `wl_clientes` (
   `email` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `wl_clientes`
---
 
-INSERT INTO `wl_clientes` (`id`, `codigoComprador`, `nomeComprador`, `email`) VALUES
-(8, '1006', 'Ana Lima', 'ana@gmail.com'),
-(9, '1007', 'Marcelo Almeida', 'marcelo@gmail.com'),
-(10, '1008', 'Patrícia Souza', 'patricia@gmail.com'),
-(11, '1009', 'Fernando Pinto', 'fernando@gmail.com'),
-(12, '1010', 'Sílvia Costa', 'silvia@gmail.com'),
-(13, '1011', 'José Dias', 'jose@gmail.com'),
-(14, '1012', 'Mariana Silva', 'mariana@gmail.com'),
-(15, '1013', 'Bruno Martins', 'bruno@gmail.com'),
-(16, '1005', 'Lucas Costa', 'lucas@gmail.com'),
-(17, '1014', 'Renata Lima', 'renata@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -251,11 +237,7 @@ CREATE TABLE `wl_compras` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Despejando dados para a tabela `wl_compras`
---
 
-INSERT INTO `wl_compras` (`id`, `SKU`, `quantidade`) VALUES
-(10, 'CAM456', 1);
 
 -- --------------------------------------------------------
 
@@ -273,21 +255,6 @@ CREATE TABLE `wl_entregas` (
   `valor` float(5,2) NOT NULL DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `wl_entregas`
---
-
-INSERT INTO `wl_entregas` (`id`, `codigoPedido`, `endereco`, `CEP`, `UF`, `pais`, `valor`) VALUES
-(512, 'P006', 'Rua D, 456', '98765-432', 'PR', 'Brasil', 10.00),
-(513, 'P007', 'Av. F, 789', '54321-987', 'SP', 'Brasil', 16.00),
-(514, 'P008', 'Rua G, 321', '23456-789', 'RJ', 'Brasil', 20.00),
-(515, 'P009', 'Rua H, 654', '12345-678', 'MG', 'Brasil', 12.00),
-(516, 'P010', 'Rua I, 543', '67890-123', 'RS', 'Brasil', 5.00),
-(517, 'P011', 'Av. J, 123', '45678-901', 'DF', 'Brasil', 23.00),
-(518, 'P012', 'Rua K, 987', '87654-321', 'BA', 'Brasil', 10.00),
-(519, 'P013', 'Rua L, 321', '23456-789', 'CE', 'Brasil', 30.00),
-(520, 'P014', 'Av. M, 111', '12345-678', 'SP', 'Brasil', 35.00),
-(521, 'P015', 'Rua N, 222', '54321-987', 'RJ', 'Brasil', 15.00);
 
 -- --------------------------------------------------------
 
@@ -302,20 +269,6 @@ CREATE TABLE `wl_estoque` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Despejando dados para a tabela `wl_estoque`
---
-
-INSERT INTO `wl_estoque` (`id`, `SKU`, `quantidade`) VALUES
-(8, 'SHO123', 1),
-(9, 'TEN987', 2),
-(10, 'MOCH201', 1),
-(11, 'CAM456', 2),
-(12, 'BON357', 5),
-(13, 'CAL789', 2),
-(14, 'CAM258', 1),
-(15, 'TEN654', 2),
-(16, 'MOCH159', 1),
-(17, 'CAM357', 3);
 
 -- --------------------------------------------------------
 
@@ -332,21 +285,7 @@ CREATE TABLE `wl_itens_pedidos` (
   `status` enum('aprovado','cancelado','pendente') NOT NULL DEFAULT 'pendente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `wl_itens_pedidos`
---
 
-INSERT INTO `wl_itens_pedidos` (`id`, `codigoPedido`, `SKU`, `quantidade`, `valor_unitario`, `status`) VALUES
-(1024, 'P006', 'SHO123', 1, 120.50, 'pendente'),
-(1025, 'P007', 'TEN987', 2, 175.49, 'pendente'),
-(1026, 'P008', 'MOCH201', 1, 150.75, 'pendente'),
-(1027, 'P009', 'CAM456', 3, 29.97, 'pendente'),
-(1028, 'P010', 'BON357', 5, 11.00, 'pendente'),
-(1029, 'P011', 'CAL789', 2, 100.00, 'pendente'),
-(1030, 'P012', 'CAM258', 1, 100.00, 'pendente'),
-(1031, 'P013', 'TEN654', 2, 137.50, 'pendente'),
-(1032, 'P014', 'MOCH159', 1, 299.99, 'pendente'),
-(1033, 'P015', 'CAM357', 3, 40.00, 'pendente');
 
 -- --------------------------------------------------------
 
@@ -364,20 +303,7 @@ CREATE TABLE `wl_pedidos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Despejando dados para a tabela `wl_pedidos`
---
 
-INSERT INTO `wl_pedidos` (`id`, `codigoPedido`, `codigoComprador`, `dataPedido`, `valor`, `status`) VALUES
-(512, 'P006', '1006', '2024-09-10', 120.50, 'pendente'),
-(513, 'P007', '1007', '2024-09-12', 350.99, 'pendente'),
-(514, 'P008', '1008', '2024-09-15', 150.75, 'pendente'),
-(515, 'P009', '1009', '2024-09-18', 89.90, 'pendente'),
-(516, 'P010', '1010', '2024-09-20', 55.00, 'pendente'),
-(517, 'P011', '1011', '2024-09-25', 199.99, 'pendente'),
-(518, 'P012', '1012', '2024-09-28', 100.00, 'pendente'),
-(519, 'P013', '1013', '2024-09-29', 275.00, 'pendente'),
-(520, 'P014', '1005', '2024-09-30', 299.99, 'pendente'),
-(521, 'P015', '1014', '2024-10-01', 120.00, 'pendente');
 
 -- --------------------------------------------------------
 
@@ -393,21 +319,7 @@ CREATE TABLE `wl_produtos` (
   `valor` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `wl_produtos`
---
 
-INSERT INTO `wl_produtos` (`id`, `SKU`, `UPC`, `nomeProduto`, `valor`) VALUES
-(8, 'SHO123', '112233445566', 'Sandália', 120.5),
-(9, 'TEN987', '223344556677', 'Tênis Esportivo', 175.49),
-(10, 'MOCH201', '334455667788', 'Mochila de Escola', 150.75),
-(11, 'CAM456', '445566778899', 'Camiseta', 29.97),
-(12, 'BON357', '556677889900', 'Boné', 11),
-(13, 'CAL789', '667788990011', 'Calça Tactel', 100),
-(14, 'CAM258', '778899001122', 'Camiseta de Futebol', 100),
-(15, 'TEN654', '889900112233', 'Tênis Casual', 137.5),
-(16, 'MOCH159', '990011223344', 'Mochila de Viagem', 299.99),
-(17, 'CAM357', '101112131415', 'Camiseta Estampada', 40);
 
 -- --------------------------------------------------------
 
@@ -433,21 +345,7 @@ CREATE TABLE `wl_tempdata` (
   `pais` varchar(15) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `wl_tempdata`
---
 
-INSERT INTO `wl_tempdata` (`codigoPedido`, `dataPedido`, `SKU`, `UPC`, `nomeProduto`, `quantidade`, `valor`, `frete`, `email`, `codigoComprador`, `nomeComprador`, `endereco`, `CEP`, `UF`, `pais`) VALUES
-('P006', '2024-09-10', 'SHO123', '112233445566', 'Sandália', 1, 120.5, 10, 'ana@gmail.com', '1006', 'Ana Lima', 'Rua D, 456', '98765-432', 'PR', 'Brasil'),
-('P007', '2024-09-12', 'TEN987', '223344556677', 'Tênis Esportivo', 2, 350.99, 16, 'marcelo@gmail.com', '1007', 'Marcelo Almeida', 'Av. F, 789', '54321-987', 'SP', 'Brasil'),
-('P008', '2024-09-15', 'MOCH201', '334455667788', 'Mochila de Escola', 1, 150.75, 20, 'patricia@gmail.com', '1008', 'Patrícia Souza', 'Rua G, 321', '23456-789', 'RJ', 'Brasil'),
-('P009', '2024-09-18', 'CAM456', '445566778899', 'Camiseta', 3, 89.9, 12, 'fernando@gmail.com', '1009', 'Fernando Pinto', 'Rua H, 654', '12345-678', 'MG', 'Brasil'),
-('P010', '2024-09-20', 'BON357', '556677889900', 'Boné', 5, 55, 5, 'silvia@gmail.com', '1010', 'Sílvia Costa', 'Rua I, 543', '67890-123', 'RS', 'Brasil'),
-('P011', '2024-09-25', 'CAL789', '667788990011', 'Calça Tactel', 2, 199.99, 23, 'jose@gmail.com', '1011', 'José Dias', 'Av. J, 123', '45678-901', 'DF', 'Brasil'),
-('P012', '2024-09-28', 'CAM258', '778899001122', 'Camiseta de Futebol', 1, 100, 10, 'mariana@gmail.com', '1012', 'Mariana Silva', 'Rua K, 987', '87654-321', 'BA', 'Brasil'),
-('P013', '2024-09-29', 'TEN654', '889900112233', 'Tênis Casual', 2, 275, 30, 'bruno@gmail.com', '1013', 'Bruno Martins', 'Rua L, 321', '23456-789', 'CE', 'Brasil'),
-('P014', '2024-09-30', 'MOCH159', '990011223344', 'Mochila de Viagem', 1, 299.99, 35, 'lucas@gmail.com', '1005', 'Lucas Costa', 'Av. M, 111', '12345-678', 'SP', 'Brasil'),
-('P015', '2024-10-01', 'CAM357', '101112131415', 'Camiseta Estampada', 3, 120, 15, 'renata@gmail.com', '1014', 'Renata Lima', 'Rua N, 222', '54321-987', 'RJ', 'Brasil');
 
 -- --------------------------------------------------------
 
@@ -460,31 +358,7 @@ CREATE TABLE `wl_tempdata_estoque` (
   `quantidade` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `wl_tempdata_estoque`
---
 
-INSERT INTO `wl_tempdata_estoque` (`SKU`, `quantidade`) VALUES
-('CAM123', 10),
-('CAL456', 5),
-('SAP789', 2),
-('BOL101', 7),
-('REL202', 6),
-('BLU303', 9),
-('CAM456', 2),
-('SHO123', 1),
-('TEN987', 2),
-('MOCH201', 1),
-('BON357', 5),
-('CAL789', 2),
-('CAM258', 1),
-('TEN654', 2),
-('MOCH159', 1),
-('CAM357', 3);
-
---
--- Índices para tabelas despejadas
---
 
 --
 -- Índices de tabela `wl_clientes`
