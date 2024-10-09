@@ -1,17 +1,17 @@
 DELIMITER //
-CREATE PROCEDURE wl_processar_estoque()  -- Mantido o nome do procedimento
+CREATE PROCEDURE wl_processar_estoque()  
 BEGIN
 
     -- Declaração de variáveis para armazenar os valores do cursor
     DECLARE v_SKU VARCHAR(20);  
     DECLARE v_quantidade INT;  
-    DECLARE terminou INT DEFAULT 0;  -- Alterado o nome de 'pronto' para 'terminou' para diferenciar
+    DECLARE terminou INT DEFAULT 0;  
 
     -- Definição do cursor para selecionar dados da tabela temporária
     DECLARE cursor_estoque CURSOR FOR SELECT SKU, quantidade FROM wl_tempdata_estoque;
 
     -- Manipulador para lidar com o fim do cursor
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET terminou = 1;  -- Alterei o nome do manipulador
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET terminou = 1;  
 
     -- Abrindo o cursor para processar as linhas da tabela temporária
     OPEN cursor_estoque;
