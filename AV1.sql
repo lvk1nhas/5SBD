@@ -110,96 +110,104 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `wl_processar_estoque` ()   BEGIN
 
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `wl_processar_pedidos_v2` ()   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `wl_processar_pedidos_v2` ()  
+BEGIN
 
- 
     DECLARE v_codigoPedido INT;
     DECLARE v_statusPedido VARCHAR(20);
     DECLARE v_codigoProduto VARCHAR(20);
     DECLARE v_quantidade INT;
     DECLARE pronto INT DEFAULT 0;  -- Indica se o cursor já processou todos os registros
 
-    
+    -- Cursor para selecionar os pedidos ordenados pelo valor em ordem decrescente
     DECLARE cursor_pedidos CURSOR FOR 
     SELECT codigoPedido, status 
     FROM wl_pedidos 
-    ORDER BY valor DESC;  -- Ordenando os pedidos pelo valor em ordem decrescente
+    ORDER BY valor DESC;  
 
+    -- Cursor para selecionar os itens de cada pedido
     DECLARE cursor_itens CURSOR FOR 
     SELECT SKU, quantidade 
-    FROM wl_itens_pedidos;
-    
-  
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET pronto = 1;
+    FROM wl_itens_pedidos
+    WHERE codigoPedido = v_codigoPedido;  -- Filtra pelo pedido atual
 
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET pronto = 1;
 
     OPEN cursor_pedidos;
 
-    
     pedidos_loop: LOOP
-
-      
+        -- Obtém o próximo pedido
         FETCH cursor_pedidos INTO v_codigoPedido, v_statusPedido;
 
-        
-        IF NOT pronto THEN
-
-      
-            IF v_statusPedido = 'pendente' THEN
-
-              
-                OPEN cursor_itens;
-
-              
-                itens_loop: LOOP
-                  
-                    FETCH cursor_itens INTO v_codigoProduto, v_quantidade;
-
-                 
-                    IF pronto THEN
-                        LEAVE itens_loop;
-                    END IF;
-
-                  
-                    IF (SELECT quantidade FROM wl_estoque WHERE SKU = v_codigoProduto) >= v_quantidade THEN
-                        
-                        UPDATE wl_itens_pedidos SET status = 'aprovado' WHERE codigoPedido = v_codigoPedido AND SKU = v_codigoProduto;
-                        UPDATE wl_estoque SET quantidade = quantidade - v_quantidade WHERE SKU = v_codigoProduto;
-                    ELSE
-                        
-                        UPDATE wl_pedidos SET status = 'pendente' WHERE codigoPedido = v_codigoPedido;
-                        UPDATE wl_itens_pedidos SET status = 'pendente' WHERE codigoPedido = v_codigoPedido AND SKU = v_codigoProduto;
-
-                        
-                        IF EXISTS (SELECT 1 FROM wl_compras WHERE SKU = v_codigoProduto) THEN
-                            UPDATE wl_compras SET quantidade = quantidade + v_quantidade WHERE SKU = v_codigoProduto;
-                        ELSE
-                           
-                            INSERT INTO wl_compras (SKU, quantidade) VALUES (v_codigoProduto, v_quantidade);
-                        END IF;
-                    END IF;
-                END LOOP;
-
-              
-                CLOSE cursor_itens;
-
-               
-                IF NOT EXISTS (SELECT 1 FROM wl_itens_pedidos WHERE codigoPedido = v_codigoPedido AND status = 'pendente') THEN
-                    UPDATE wl_pedidos SET status = 'aprovado' WHERE codigoPedido = v_codigoPedido;
-                END IF;
-            END IF;
-        ELSE
-           
+        IF pronto THEN
             LEAVE pedidos_loop;
         END IF;
+
+        -- Processa apenas pedidos com status 'pendente'
+        IF v_statusPedido = 'pendente' THEN
+
+            -- Abre o cursor para os itens do pedido atual
+            OPEN cursor_itens;
+
+            itens_loop: LOOP
+                -- Obtém o próximo item do pedido
+                FETCH cursor_itens INTO v_codigoProduto, v_quantidade;
+
+                IF pronto THEN
+                    LEAVE itens_loop;
+                END IF;
+
+                -- Verifica se há estoque suficiente
+                IF (SELECT quantidade FROM wl_estoque WHERE SKU = v_codigoProduto) >= v_quantidade THEN
+                    -- Aprova o item e atualiza o estoque
+                    UPDATE wl_itens_pedidos 
+                    SET status = 'aprovado' 
+                    WHERE codigoPedido = v_codigoPedido AND SKU = v_codigoProduto;
+                    
+                    UPDATE wl_estoque 
+                    SET quantidade = quantidade - v_quantidade 
+                    WHERE SKU = v_codigoProduto;
+                ELSE
+                    -- Marca o pedido e o item como 'pendente'
+                    UPDATE wl_pedidos 
+                    SET status = 'pendente' 
+                    WHERE codigoPedido = v_codigoPedido;
+                    
+                    UPDATE wl_itens_pedidos 
+                    SET status = 'pendente' 
+                    WHERE codigoPedido = v_codigoPedido AND SKU = v_codigoProduto;
+
+                    -- Atualiza ou insere a quantidade necessária de compra
+                    IF EXISTS (SELECT 1 FROM wl_compras WHERE SKU = v_codigoProduto) THEN
+                        UPDATE wl_compras 
+                        SET quantidade = quantidade + v_quantidade 
+                        WHERE SKU = v_codigoProduto;
+                    ELSE
+                        INSERT INTO wl_compras (SKU, quantidade) 
+                        VALUES (v_codigoProduto, v_quantidade);
+                    END IF;
+                END IF;
+            END LOOP;
+
+            CLOSE cursor_itens;
+
+            -- Se todos os itens do pedido forem aprovados, aprova o pedido
+            IF NOT EXISTS (SELECT 1 FROM wl_itens_pedidos WHERE codigoPedido = v_codigoPedido AND status = 'pendente') THEN
+                UPDATE wl_pedidos 
+                SET status = 'aprovado' 
+                WHERE codigoPedido = v_codigoPedido;
+            END IF;
+
+        END IF;
+
     END LOOP;
 
-    
     CLOSE cursor_pedidos;
 
 END$$
 
 DELIMITER ;
+
 
 -- --------------------------------------------------------
 
