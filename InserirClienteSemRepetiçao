@@ -1,7 +1,0 @@
-Comandos SQL
-
-Comando para inserir clientes sem repetição, com base nos dados que estavam na tabela waterfall_dadostemp:
-INSERT INTO `waterfall_clientes` (nomeComprador, email, codigoComprador, endereco, CEP, UF, pais) 
-SELECT DISTINCT nomeComprador, email, codigoComprador, endereco, CEP, UF, pais 
-FROM waterfall_dadostemp
-GROUP BY codigoComprador;
