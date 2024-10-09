@@ -1,0 +1,368 @@
+--
+-- Estrutura para tabela `wl_clientes`
+--
+
+CREATE TABLE `wl_clientes` (
+  `id` int(11) NOT NULL,
+  `codigoComprador` varchar(32) NOT NULL,
+  `nomeComprador` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `wl_clientes`
+--
+
+INSERT INTO `wl_clientes` (`id`, `codigoComprador`, `nomeComprador`, `email`) VALUES
+(1, '2001', 'Carlos Pereira', 'carlos.pereira@gmail.com'),
+(2, '2002', 'Fernanda Lima', 'fernanda.lima@yahoo.com'),
+(3, '2003', 'Juliana Carvalho', 'juliana.carvalho@outlook.com'),
+(4, '2004', 'Rafael Costa', 'rafael.costa@gmail.com'),
+(5, '2005', 'Amanda Souza', 'amanda.souza@hotmail.com');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `wl_compras`
+--
+
+CREATE TABLE `wl_compras` (
+  `id` int(11) NOT NULL,
+  `SKU` varchar(20) NOT NULL,
+  `quantidade` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `wl_compras`
+--
+
+INSERT INTO `wl_compras` (`id`, `SKU`, `quantidade`) VALUES
+(1, 'CAM123', 150),
+(2, 'CAL456', 75),
+(3, 'SAP789', 200),
+(4, 'BOL101', 80),
+(5, 'REL202', 60),
+(6, 'BLU303', 90);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `wl_entregas`
+--
+
+CREATE TABLE `wl_entregas` (
+  `id` int(11) NOT NULL,
+  `codigoPedido` varchar(32) NOT NULL,
+  `endereco` varchar(255) NOT NULL,
+  `CEP` varchar(11) NOT NULL,
+  `UF` varchar(2) NOT NULL,
+  `pais` varchar(20) NOT NULL,
+  `valor` float(5,2) NOT NULL DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `wl_entregas`
+--
+
+INSERT INTO `wl_entregas` (`id`, `codigoPedido`, `endereco`, `CEP`, `UF`, `pais`, `valor`) VALUES
+(1, 'E001', 'Rua das Flores, 100', '12345-678', 'SP', 'Brasil', 50.00),
+(2, 'E002', 'Avenida Brasil, 500', '98765-432', 'RJ', 'Brasil', 25.00),
+(3, 'E003', 'Rua dos Lírios, 300', '54321-987', 'MG', 'Brasil', 35.00),
+(4, 'E004', 'Avenida Paulista, 1500', '11111-222', 'SP', 'Brasil', 40.00),
+(5, 'E005', 'Rua João Pessoa, 80', '67890-123', 'RS', 'Brasil', 45.00);
+
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `wl_estoque`
+--
+
+CREATE TABLE `wl_estoque` (
+  `id` int(11) NOT NULL,
+  `SKU` varchar(20) NOT NULL,
+  `quantidade` int(11) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `wl_estoque`
+--
+
+INSERT INTO `wl_estoque` (`id`, `SKU`, `quantidade`) VALUES
+(1, 'CAM123', 10),
+(2, 'CAL456', 5),
+(3, 'SAP789', 2),
+(4, 'BOL101', 7),
+(5, 'REL202', 6),
+(6, 'BLU303', 9);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `wl_itens_pedidos`
+--
+
+CREATE TABLE `wl_itens_pedidos` (
+  `id` int(11) NOT NULL,
+  `codigoPedido` varchar(20) NOT NULL,
+  `SKU` varchar(20) NOT NULL,
+  `quantidade` int(11) NOT NULL,
+  `valor_unitario` float(5,2) NOT NULL DEFAULT 0.00,
+  `status` enum('aprovado','cancelado','pendente') NOT NULL DEFAULT 'pendente'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `wl_itens_pedidos`
+--
+
+INSERT INTO `wl_itens_pedidos` (`id`, `codigoPedido`, `SKU`, `quantidade`, `valor_unitario`, `status`) VALUES
+(1, 'E001', 'CAM123', 2, 120.00, 'pendente'),
+(2, 'E002', 'CAL456', 1, 85.00, 'pendente'),
+(3, 'E003', 'SAP789', 3, 150.00, 'pendente'),
+(4, 'E004', 'BOL101', 1, 60.00, 'pendente'),
+(5, 'E005', 'REL202', 2, 250.00, 'pendente');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `wl_pedidos`
+--
+
+CREATE TABLE `wl_pedidos` (
+  `id` int(11) NOT NULL,
+  `codigoPedido` varchar(32) NOT NULL,
+  `codigoComprador` varchar(32) NOT NULL,
+  `dataPedido` date NOT NULL,
+  `valor` float(5,2) NOT NULL,
+  `status` enum('aprovado','cancelado','pendente') NOT NULL DEFAULT 'pendente'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `wl_pedidos`
+--
+
+INSERT INTO `wl_pedidos` (`id`, `codigoPedido`, `codigoComprador`, `dataPedido`, `valor`, `status`) VALUES
+(1, 'E001', '2001', '2024-09-10', 240.00, 'pendente'),
+(2, 'E002', '2002', '2024-09-11', 85.00, 'pendente'),
+(3, 'E003', '2003', '2024-09-12', 450.00, 'pendente'),
+(4, 'E004', '2004', '2024-09-13', 60.00, 'pendente'),
+(5, 'E005', '2005', '2024-09-14', 500.00, 'pendente');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `wl_produtos`
+--
+
+CREATE TABLE `wl_produtos` (
+  `id` int(11) NOT NULL,
+  `SKU` varchar(20) NOT NULL,
+  `UPC` varchar(20) NOT NULL,
+  `nomeProduto` varchar(50) NOT NULL,
+  `valor` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `wl_produtos`
+--
+
+INSERT INTO `wl_produtos` (`id`, `SKU`, `UPC`, `nomeProduto`, `valor`) VALUES
+(1, 'CAM123', '123456789012', 'Camiseta', 120.00),  -- atualizado
+(2, 'CAL456', '987654321098', 'Calça Jeans', 85.00),  -- atualizado
+(3, 'SAP789', '765432109876', 'Sapato', 120.00),
+(4, 'BOL101', '345678901234', 'Bolsa', 60.00),       -- atualizado
+(5, 'REL202', '890123456789', 'Relógio', 250.00),     -- atualizado
+(6, 'BLU303', '567890123456', 'Blusa', 100.00);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `wl_tempdata`
+--
+
+CREATE TABLE `wl_tempdata` (
+  `codigoPedido` varchar(30) NOT NULL,
+  `dataPedido` date NOT NULL,
+  `SKU` varchar(20) NOT NULL,
+  `UPC` varchar(20) NOT NULL,
+  `nomeProduto` varchar(100) NOT NULL,
+  `quantidade` int(11) NOT NULL,
+  `valor` float NOT NULL,
+  `frete` int(11) NOT NULL,
+  `email` varchar(200) NOT NULL,
+  `codigoComprador` varchar(4) NOT NULL,
+  `nomeComprador` varchar(50) NOT NULL,
+  `endereco` varchar(255) NOT NULL,
+  `CEP` varchar(11) NOT NULL,
+  `UF` varchar(2) NOT NULL,
+  `pais` varchar(15) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `wl_tempdata_estoque`
+--
+
+CREATE TABLE `wl_tempdata_estoque` (
+  `SKU` varchar(20) NOT NULL,
+  `quantidade` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `wl_tempdata_estoque`
+--
+
+INSERT INTO `wl_tempdata_estoque` (SKU, quantidade) VALUES
+('CAM123', 10),
+('CAL456', 5),
+('SAP789', 2),
+('BOL101', 7),
+('REL202', 6),
+('BLU303', 9);
+
+-- --------------------------------------------------------
+
+--
+
+--
+-- Índices para tabelas despejadas
+--
+
+--
+-- Índices de tabela `wl_clientes`
+--
+ALTER TABLE `wl_clientes`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigoComprador` (`codigoComprador`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Índices de tabela `wl_compras`
+--
+ALTER TABLE `wl_compras`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `SKU` (`SKU`);
+
+--
+-- Índices de tabela `wl_entregas`
+--
+ALTER TABLE `wl_entregas`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigoPedido` (`codigoPedido`);
+
+--
+-- Índices de tabela `wl_estoque`
+--
+ALTER TABLE `wl_estoque`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `SKU` (`SKU`);
+
+--
+-- Índices de tabela `wl_itens_pedidos`
+--
+ALTER TABLE `wl_itens_pedidos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FK_ItensPedidosCodigoComprador` (`codigoPedido`),
+  ADD KEY `FK_ItensPedidosSKU` (`SKU`);
+
+--
+-- Índices de tabela `wl_pedidos`
+--
+ALTER TABLE `wl_pedidos`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigoPedido` (`codigoPedido`),
+  ADD KEY `FK_PedidosComprador` (`codigoComprador`);
+
+--
+-- Índices de tabela `wl_produtos`
+--
+ALTER TABLE `wl_produtos`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `SKU` (`SKU`),
+  ADD UNIQUE KEY `UPC` (`UPC`);
+
+--
+-- AUTO_INCREMENT para tabelas despejadas
+--
+
+--
+-- AUTO_INCREMENT de tabela `wl_clientes`
+--
+ALTER TABLE `wl_clientes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT de tabela `wl_compras`
+--
+ALTER TABLE `wl_compras`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT de tabela `wl_entregas`
+--
+ALTER TABLE `wl_entregas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=512;
+
+--
+-- AUTO_INCREMENT de tabela `wl_estoque`
+--
+ALTER TABLE `wl_estoque`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT de tabela `wl_itens_pedidos`
+--
+ALTER TABLE `wl_itens_pedidos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1024;
+
+--
+-- AUTO_INCREMENT de tabela `wl_pedidos`
+--
+ALTER TABLE `wl_pedidos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=512;
+
+--
+-- AUTO_INCREMENT de tabela `wl_produtos`
+--
+ALTER TABLE `wl_produtos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- Restrições para tabelas despejadas
+--
+
+--
+-- Restrições para tabelas `wl_compras`
+--
+ALTER TABLE `wl_compras`
+  ADD CONSTRAINT `FK_ComprasSKU` FOREIGN KEY (`SKU`) REFERENCES `wl_produtos` (`SKU`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Restrições para tabelas `wl_entregas`
+--
+ALTER TABLE `wl_entregas`
+  ADD CONSTRAINT `FK_EntregasCodigoPedido` FOREIGN KEY (`codigoPedido`) REFERENCES `wl_pedidos` (`codigoPedido`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Restrições para tabelas `wl_estoque`
+--
+ALTER TABLE `wl_estoque`
+  ADD CONSTRAINT `FK_EstoqueSKU` FOREIGN KEY (`SKU`) REFERENCES `wl_produtos` (`SKU`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Restrições para tabelas `wl_itens_pedidos`
+--
+ALTER TABLE `wl_itens_pedidos`
+  ADD CONSTRAINT `FK_ItensPedidosCodigoComprador` FOREIGN KEY (`codigoPedido`) REFERENCES `wl_pedidos` (`codigoPedido`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_ItensPedidosSKU` FOREIGN KEY (`SKU`) REFERENCES `wl_produtos` (`SKU`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Restrições para tabelas `wl_pedidos`
+--
+ALTER TABLE `wl_pedidos`
+  ADD CONSTRAINT `FK_PedidosComprador` FOREIGN KEY (`codigoComprador`) REFERENCES `wl_clientes` (`codigoComprador`) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
+
+
+
