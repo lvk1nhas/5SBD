@@ -30,13 +30,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `wl_processar_estoque` ()   BEGIN
     -- Declaração de variáveis para armazenar os valores do cursor
     DECLARE v_SKU VARCHAR(20);  
     DECLARE v_quantidade INT;  
-    DECLARE terminou INT DEFAULT 0; 
+    DECLARE terminou INT DEFAULT 0;  -- Alterado o nome de 'pronto' para 'terminou' para diferenciar
 
     -- Definição do cursor para selecionar dados da tabela temporária
     DECLARE cursor_estoque CURSOR FOR SELECT SKU, quantidade FROM wl_tempdata_estoque;
 
     -- Manipulador para lidar com o fim do cursor
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET terminou = 1; 
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET terminou = 1;  -- Alterei o nome do manipulador
 
     -- Abrindo o cursor para processar as linhas da tabela temporária
     OPEN cursor_estoque;
@@ -74,21 +74,27 @@ END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `wl_processar_pedidos_v2` ()   BEGIN
 
-    -- Variáveis usadas para armazenar os valores dos pedidos e seus itens
+ 
     DECLARE v_codigoPedido INT;
     DECLARE v_statusPedido VARCHAR(20);
     DECLARE v_codigoProduto VARCHAR(20);
     DECLARE v_quantidade INT;
     DECLARE pronto INT DEFAULT 0;  -- Indica se o cursor já processou todos os registros
 
-    -- Cursores para os pedidos e itens de pedidos
-    DECLARE cursor_pedidos CURSOR FOR SELECT codigoPedido, status FROM wl_pedidos;
-    DECLARE cursor_itens CURSOR FOR SELECT SKU, quantidade FROM wl_itens_pedidos;
     
-    -- Handler para quando o cursor não encontrar mais registros
+    DECLARE cursor_pedidos CURSOR FOR 
+    SELECT codigoPedido, status 
+    FROM wl_pedidos 
+    ORDER BY valor DESC;  -- Ordenando os pedidos pelo valor em ordem decrescente
+
+    DECLARE cursor_itens CURSOR FOR 
+    SELECT SKU, quantidade 
+    FROM wl_itens_pedidos;
+    
+  
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET pronto = 1;
 
-    -- 1. Inserindo novos clientes que ainda não estão na base
+       -- 1. Inserindo novos clientes que ainda não estão na base
     INSERT INTO wl_clientes (codigoComprador, nomeComprador, email)
     SELECT DISTINCT codigoComprador, nomeComprador, email
     FROM wl_tempdata 
@@ -123,72 +129,69 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `wl_processar_pedidos_v2` ()   BEGIN
     SELECT DISTINCT SKU FROM wl_tempdata
     WHERE NOT EXISTS (SELECT 1 FROM wl_estoque WHERE SKU = wl_tempdata.SKU);
 
-    -- Limpar a tabela temporária de dados
-    TRUNCATE TABLE wl_tempdata;
 
-    -- Abrir o cursor de pedidos
     OPEN cursor_pedidos;
 
-    -- Loop principal para processar os pedidos pendentes
+    
     pedidos_loop: LOOP
 
-        -- Buscar os dados do próximo pedido
+      
         FETCH cursor_pedidos INTO v_codigoPedido, v_statusPedido;
 
-        -- Se o cursor não encontrar mais registros, saia do loop
+        
         IF NOT pronto THEN
 
-            -- Verificar o status do pedido
+      
             IF v_statusPedido = 'pendente' THEN
 
-                -- Abrir o cursor para itens do pedido
+              
                 OPEN cursor_itens;
 
-                -- Loop para processar os itens do pedido
+              
                 itens_loop: LOOP
-                    -- Buscar dados do item
+                  
                     FETCH cursor_itens INTO v_codigoProduto, v_quantidade;
 
-                    -- Se não houver mais itens, sair do loop
+                 
                     IF pronto THEN
                         LEAVE itens_loop;
                     END IF;
 
-                    -- Verificar a disponibilidade no estoque
+                  
                     IF (SELECT quantidade FROM wl_estoque WHERE SKU = v_codigoProduto) >= v_quantidade THEN
-                        -- Atualizar o status do item e diminuir o estoque
+                        
                         UPDATE wl_itens_pedidos SET status = 'aprovado' WHERE codigoPedido = v_codigoPedido AND SKU = v_codigoProduto;
                         UPDATE wl_estoque SET quantidade = quantidade - v_quantidade WHERE SKU = v_codigoProduto;
                     ELSE
-                        -- Caso o estoque não seja suficiente, marcar como pendente
+                        
                         UPDATE wl_pedidos SET status = 'pendente' WHERE codigoPedido = v_codigoPedido;
                         UPDATE wl_itens_pedidos SET status = 'pendente' WHERE codigoPedido = v_codigoPedido AND SKU = v_codigoProduto;
 
-                        -- Se o produto já estiver na lista de compras, atualizar a quantidade
+                        
                         IF EXISTS (SELECT 1 FROM wl_compras WHERE SKU = v_codigoProduto) THEN
                             UPDATE wl_compras SET quantidade = quantidade + v_quantidade WHERE SKU = v_codigoProduto;
                         ELSE
-                            -- Caso contrário, inserir o produto na lista de compras
+                           
                             INSERT INTO wl_compras (SKU, quantidade) VALUES (v_codigoProduto, v_quantidade);
                         END IF;
                     END IF;
                 END LOOP;
 
-                -- Fechar o cursor de itens após processar todos
+              
                 CLOSE cursor_itens;
 
-                -- Se todos os itens foram aprovados, aprovar o pedido
+               
                 IF NOT EXISTS (SELECT 1 FROM wl_itens_pedidos WHERE codigoPedido = v_codigoPedido AND status = 'pendente') THEN
                     UPDATE wl_pedidos SET status = 'aprovado' WHERE codigoPedido = v_codigoPedido;
                 END IF;
             END IF;
         ELSE
-            -- Sair do loop se o cursor não encontrar mais registros
+           
             LEAVE pedidos_loop;
         END IF;
     END LOOP;
 
-    -- Fechar o cursor de pedidos
+    
     CLOSE cursor_pedidos;
 
 END$$
@@ -208,16 +211,6 @@ CREATE TABLE `wl_clientes` (
   `email` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `wl_clientes`
---
-
-INSERT INTO `wl_clientes` (`id`, `codigoComprador`, `nomeComprador`, `email`) VALUES
-(1, '2001', 'Carlos Pereira', 'carlos.pereira@gmail.com'),
-(2, '2002', 'Fernanda Lima', 'fernanda.lima@yahoo.com'),
-(3, '2003', 'Juliana Carvalho', 'juliana.carvalho@outlook.com'),
-(4, '2004', 'Rafael Costa', 'rafael.costa@gmail.com'),
-(5, '2005', 'Amanda Souza', 'amanda.souza@hotmail.com');
 
 -- --------------------------------------------------------
 
@@ -231,17 +224,7 @@ CREATE TABLE `wl_compras` (
   `quantidade` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `wl_compras`
---
 
-INSERT INTO `wl_compras` (`id`, `SKU`, `quantidade`) VALUES
-(1, 'CAM123', 150),
-(2, 'CAL456', 75),
-(3, 'SAP789', 200),
-(4, 'BOL101', 80),
-(5, 'REL202', 60),
-(6, 'BLU303', 90);
 
 -- --------------------------------------------------------
 
@@ -259,16 +242,6 @@ CREATE TABLE `wl_entregas` (
   `valor` float(5,2) NOT NULL DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `wl_entregas`
---
-
-INSERT INTO `wl_entregas` (`id`, `codigoPedido`, `endereco`, `CEP`, `UF`, `pais`, `valor`) VALUES
-(1, 'E001', 'Rua das Flores, 100', '12345-678', 'SP', 'Brasil', 50.00),
-(2, 'E002', 'Avenida Brasil, 500', '98765-432', 'RJ', 'Brasil', 25.00),
-(3, 'E003', 'Rua dos Lírios, 300', '54321-987', 'MG', 'Brasil', 35.00),
-(4, 'E004', 'Avenida Paulista, 1500', '11111-222', 'SP', 'Brasil', 40.00),
-(5, 'E005', 'Rua João Pessoa, 80', '67890-123', 'RS', 'Brasil', 45.00);
 
 -- --------------------------------------------------------
 
@@ -282,17 +255,6 @@ CREATE TABLE `wl_estoque` (
   `quantidade` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `wl_estoque`
---
-
-INSERT INTO `wl_estoque` (`id`, `SKU`, `quantidade`) VALUES
-(1, 'CAM123', 10),
-(2, 'CAL456', 5),
-(3, 'SAP789', 2),
-(4, 'BOL101', 7),
-(5, 'REL202', 6),
-(6, 'BLU303', 9);
 
 -- --------------------------------------------------------
 
@@ -309,16 +271,6 @@ CREATE TABLE `wl_itens_pedidos` (
   `status` enum('aprovado','cancelado','pendente') NOT NULL DEFAULT 'pendente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `wl_itens_pedidos`
---
-
-INSERT INTO `wl_itens_pedidos` (`id`, `codigoPedido`, `SKU`, `quantidade`, `valor_unitario`, `status`) VALUES
-(1, 'E001', 'CAM123', 2, 120.00, 'pendente'),
-(2, 'E002', 'CAL456', 1, 85.00, 'pendente'),
-(3, 'E003', 'SAP789', 3, 150.00, 'pendente'),
-(4, 'E004', 'BOL101', 1, 60.00, 'pendente'),
-(5, 'E005', 'REL202', 2, 250.00, 'pendente');
 
 -- --------------------------------------------------------
 
@@ -335,16 +287,7 @@ CREATE TABLE `wl_pedidos` (
   `status` enum('aprovado','cancelado','pendente') NOT NULL DEFAULT 'pendente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `wl_pedidos`
---
 
-INSERT INTO `wl_pedidos` (`id`, `codigoPedido`, `codigoComprador`, `dataPedido`, `valor`, `status`) VALUES
-(1, 'E001', '2001', '2024-09-10', 240.00, 'pendente'),
-(2, 'E002', '2002', '2024-09-11', 85.00, 'pendente'),
-(3, 'E003', '2003', '2024-09-12', 450.00, 'pendente'),
-(4, 'E004', '2004', '2024-09-13', 60.00, 'pendente'),
-(5, 'E005', '2005', '2024-09-14', 500.00, 'pendente');
 
 -- --------------------------------------------------------
 
@@ -360,17 +303,6 @@ CREATE TABLE `wl_produtos` (
   `valor` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `wl_produtos`
---
-
-INSERT INTO `wl_produtos` (`id`, `SKU`, `UPC`, `nomeProduto`, `valor`) VALUES
-(1, 'CAM123', '123456789012', 'Camiseta', 120),
-(2, 'CAL456', '987654321098', 'Calça Jeans', 85),
-(3, 'SAP789', '765432109876', 'Sapato', 120),
-(4, 'BOL101', '345678901234', 'Bolsa', 60),
-(5, 'REL202', '890123456789', 'Relógio', 250),
-(6, 'BLU303', '567890123456', 'Blusa', 100);
 
 -- --------------------------------------------------------
 
@@ -407,21 +339,8 @@ CREATE TABLE `wl_tempdata_estoque` (
   `quantidade` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `wl_tempdata_estoque`
---
 
-INSERT INTO `wl_tempdata_estoque` (`SKU`, `quantidade`) VALUES
-('CAM123', 10),
-('CAL456', 5),
-('SAP789', 2),
-('BOL101', 7),
-('REL202', 6),
-('BLU303', 9);
 
---
--- Índices para tabelas despejadas
---
 
 --
 -- Índices de tabela `wl_clientes`
