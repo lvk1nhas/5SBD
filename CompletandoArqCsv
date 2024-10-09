@@ -1,8 +1,0 @@
-Comando: SQL pra importação dos dados em arquivo CSV:
-
-LOAD DATA INFILE 'C:/Users/casol/Downloads/produtos.csv'
-INTO TABLE wl_produtos
-FIELDS TERMINATED BY ',' 
-OPTIONALLY ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-(id, codigo, nome, valor, quantidade);
