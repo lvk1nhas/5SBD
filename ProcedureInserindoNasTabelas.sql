@@ -1,6 +1,4 @@
-DELIMITER $$
-
-CREATE PROCEDURE sp_InserirDados()
+CREATE PROCEDURE InserirDados()
 BEGIN
     -- 1. Inserindo novos clientes que ainda não estão na base
     INSERT INTO wl_clientes (codigoComprador, nomeComprador, email)
@@ -10,9 +8,10 @@ BEGIN
 
     -- 2. Inserindo novos pedidos que ainda não existem na tabela de pedidos
     INSERT INTO wl_pedidos (codigoPedido, codigoComprador, dataPedido, valor, status)
-    SELECT DISTINCT codigoPedido, codigoComprador, dataPedido, valor, 'pendente'
-    FROM wl_tempdata 
-    WHERE NOT EXISTS (SELECT 1 FROM wl_pedidos WHERE codigoPedido = wl_tempdata.codigoPedido);
+    SELECT DISTINCT codigoPedido, codigoComprador, dataPedido, SUM(valor), 'pendente'
+    FROM wl_tempdata
+    WHERE NOT EXISTS (SELECT 1 FROM wl_pedidos WHERE codigoPedido = wl_tempdata.codigoPedido)
+    GROUP BY codigoPedido;
 
     -- 3. Inserindo novos produtos na tabela de produtos
     INSERT INTO wl_produtos (SKU, UPC, nomeProduto, valor)
