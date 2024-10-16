@@ -1,15 +1,19 @@
 -- Codigo para carregar os dados de pedidos
-LOAD DATA INFILE 'C:/tools/htdocs/MinhaAv1/Arquivos/pedidos.csv'
-INTO TABLE wl_tempdata
-FIELDS TERMINATED BY ','
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS;
-
--- Código para recarregar o estoque com base no arquivo
-LOAD DATA INFILE 'C:/tools/htdocs/MinhaAv1/Arquivos/estoque.csv'
-INTO TABLE wl_tempdata_estoque
-FIELDS TERMINATED BY ','
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS;
+--LOAD DATA INFILE 'C:/tools/htdocs/MinhaAv1/Arquivos/pedidos.csv'
+--INTO TABLE wl_tempdata
+--FIELDS TERMINATED BY ','
+--ENCLOSED BY '"'
+--LINES TERMINATED BY '\n'
+--IGNORE 1 ROWS;
+codigoPedido,dataPedido,SKU,UPC,nomeProduto,qtd,valor,frete,email,codigoComprador,nomeComprador,endereco,CEP,UF,pais
+P006,2024-09-10,SHO123,112233445566,Sandália,1,120.50,10.00,ana@gmail.com,1006,Ana Lima,"Rua D, 456",98765-432,PR,Brasil
+P006,2024-09-10,TEN987,223344556677,Tenis Esportivo,1,175.49,10.00,ana@gmail.com,1006,Ana Lima,"Rua D, 456",98765-432,PR,Brasil
+P007,2024-09-12,TEN987,223344556677,Tênis Esportivo,2,350.99,15.50,marcelo@gmail.com,1007,Marcelo Almeida,"Av. F, 789",54321-987,SP,Brasil
+P008,2024-09-15,MOCH201,334455667788,Mochila de Escola,1,150.75,20.20,patricia@gmail.com,1008,Patrícia Souza,"Rua G, 321",23456-789,RJ,Brasil
+P009,2024-09-18,CAM456,445566778899,Camiseta,3,89.90,12.00,fernando@gmail.com,1009,Fernando Pinto,"Rua H, 654",12345-678,MG,Brasil
+P010,2024-09-20,BON357,556677889900,Boné,5,55.00,5.00,silvia@gmail.com,1010,Sílvia Costa,"Rua I, 543",67890-123,RS,Brasil
+P011,2024-09-25,CAL789,667788990011,Calça Tactel,2,199.99,22.50,jose@gmail.com,1011,José Dias,"Av. J, 123",45678-901,DF,Brasil
+P012,2024-09-28,CAM258,778899001122,Camiseta de Futebol,1,100.00,10.00,mariana@gmail.com,1012,Mariana Silva,"Rua K, 987",87654-321,BA,Brasil
+P013,2024-09-29,TEN654,889900112233,Tênis Casual,2,275.00,30.00,bruno@gmail.com,1013,Bruno Martins,"Rua L, 321",23456-789,CE,Brasil
+P014,2024-09-30,MOCH159,990011223344,Mochila de Viagem,1,299.99,35.00,lucas@gmail.com,1005,Lucas Costa,"Av. M, 111",12345-678,SP,Brasil
+P015,2024-10-01,CAM357,101112131415,Camiseta Estampada,3,120.00,15.00,renata@gmail.com,1014,Renata Lima,"Rua N, 222",54321-987,RJ,Brasil
