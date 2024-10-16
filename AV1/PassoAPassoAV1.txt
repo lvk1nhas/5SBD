@@ -1,1 +1,20 @@
+1º passo: Código AV1.sql
+Descrição - Código da AV1.
+
+2º passo: LoadingData.sql
+Descrição - Carregando os dados dos arquivos para o banco.
+
+3º passo: ProcedureInserirDados.sql
+Descrição - Inserindo os dados da tabela temporária nas tabelas.
+
+4º passo: ProcedureRecarregarEstoque.sql
+Descrição - Recarregar o estoque.
+
+5º passo: ProcedureProcessarItensPedidos.sql
+Descrição - Fazer o processamento dos itens na tabela wL_itens_pedidos, assim como na wl_compras e wl_estoque.
+
+6º passo: ProcedureProcessarPedidos.sql
+Descrição - Fazer o processamento dos pedidos.
+
+
 
