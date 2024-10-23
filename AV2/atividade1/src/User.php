@@ -7,29 +7,20 @@ class User extends Model {
     public $timestamps = true; // Usar created_at e updated_at automaticamente
     protected $fillable = ['name', 'email', 'password']; // Campos que podem ser preenchidos em massa
 
-    public static function createUser($data) {
-        if (self::emailExists($data['email'])) {
-            throw new Exception("Email já cadastrado!");
-        }
-        return self::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => password_hash($data['password'], PASSWORD_DEFAULT)
-        ]);
-    }
-
+    // Verifica se o email já existe no banco
     public static function emailExists($email) {
         return self::where('email', $email)->exists();
     }
 
+    // Atualiza os dados do usuário
     public function updateUser($data) {
         $this->name = $data['name'];
         $this->email = $data['email'];
         $this->save();
     }
     
+    // Deleta o usuário
     public function deleteUser() {
         return $this->delete();
     }
 }
-
