@@ -1,47 +1,41 @@
-<?php 
+<?php
 
 require 'bootstrap.php';
-require 'User.php';
+require 'UserController.php';
 
+$controller = new UserController();
 $users = []; // Inicializa a variável
 
 try {
     // READ: Carrega todos os usuários
-    $users = User::all();
+    $users = $controller->index();
 
     // CREATE
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'], $_POST['email'], $_POST['password'])) {
-        User::createUser($_POST);
+        $controller->create($_POST);
         header("Location: index.php");
         exit; // Redireciona após criar
     }
 
     // UPDATE
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_id'], $_POST['new_name'], $_POST['new_email'])) {
-        $user = User::find($_POST['update_id']);
-        if ($user) {
-            $user->updateUser(['name' => $_POST['new_name'], 'email' => $_POST['new_email']]);
-            header("Location: index.php");
-            exit;
-        } else {
-            echo "Usuário não encontrado!";
-        }
+        $controller->update($_POST['update_id'], [
+            'name' => $_POST['new_name'],
+            'email' => $_POST['new_email']
+        ]);
+        header("Location: index.php");
+        exit;
     }
 
     // DELETE
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
-        $user = User::find($_POST['delete_id']);
-        if ($user) {
-            $user->deleteUser();
-            header("Location: index.php");
-            exit;
-        } else {
-            echo "Usuário não encontrado!";
-        }
+        $controller->delete($_POST['delete_id']);
+        header("Location: index.php");
+        exit;
     }
 
 } catch (Exception $e) {
-    echo $e->getMessage();
+    echo $e->getMessage(); // Exibe a mensagem de erro
 }
 
 // Exibir usuários cadastrados
