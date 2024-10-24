@@ -44,7 +44,6 @@ foreach ($users as $user) {
     echo $user->id . " - " . $user->name . " - " . $user->email . "<br>";
 }
 
-// Formulários...
 ?>
 
 <!-- Formulários para criar, atualizar e deletar usuários -->
