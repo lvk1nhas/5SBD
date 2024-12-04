@@ -1,1 +1,1 @@
-Pasta para conteúdos pós AV1
+Pasta para conteúdos referentes a AV2
