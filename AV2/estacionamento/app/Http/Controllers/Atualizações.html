@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atualizações no Código - Estacionamento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+        }
+        main {
+            padding: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #007BFF;
+        }
+        .section ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        .section ul li {
+            margin-bottom: 10px;
+        }
+        .section .code-block {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .section .code-block code {
+            color: #d63384;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Atualizações no Código - Estacionamento</h1>
+</header>
+
+<main>
+    <div class="section">
+        <h2>1. Alterações na Função Update</h2>
+        <ul>
+            <li>Inicialmente, trabalhei com uma função <strong>update</strong> na tabela vagas para ocupar e desocupar.</li>
+            <li>Dividi essa função em duas (ocupar/desocupar) e coloquei-as no controller do <strong>VagaOcupada</strong>, pois fazia mais sentido e foi solicitado pelo professor.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>2. Mudança no Status da Vaga ao Desocupar</h2>
+        <ul>
+            <li>Ao desocupar uma vaga, a vaga já fica <strong>disponível</strong> e não mais pendente.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>3. Adição do Método Calcular Preço no Modelo Pagamento</h2>
+        <ul>
+            <li>Adicionei o método <strong>CalcularPreco</strong> no Modelo da classe <strong>Pagamento</strong>.</li>
+        </ul>
+        <h3>Explicação:</h3>
+        <ul>
+            <li><strong>Responsabilidade da Model:</strong> A model no Laravel segue o princípio do "Domain-Driven Design" (DDD), onde cada modelo deve ser responsável pelos dados e pela lógica de negócios relacionados a esse dado. No caso da minha aplicação, a <strong>VagaOcupada</strong> tem a responsabilidade de manter e gerenciar as informações de uma vaga que está ocupada, incluindo o cálculo do preço baseado na duração da ocupação.</li>
+            <li><strong>Encapsulamento e Coesão:</strong> Ao colocar a função <strong>calcularPreco</strong> na model, estou encapsulando a lógica de cálculo dentro do modelo de dados, tornando a aplicação mais coesa. O modelo <strong>VagaOcupada</strong> deve ser responsável por tudo o que envolve uma vaga ocupada, incluindo o cálculo do preço. Isso melhora a manutenibilidade e a legibilidade do código.</li>
+            <li><strong>Princípio da Orientação a Objetos: Métodos em Models:</strong> Os dados como <strong>horario_entrada</strong> e <strong>horario_saida</strong> pertencem à classe <strong>VagaOcupada</strong>, e o método que faz o cálculo sobre esses dados faz sentido estar nela. Quando coloquei a lógica de cálculo no controller, quebrei o princípio da coesão, já que o controller estava fazendo algo que deveria ser responsabilidade do modelo (a lógica de cálculo do preço). Isso tornaria o código mais propenso a erros.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>4. Adição de Método para Mudar o Tipo da Vaga</h2>
+        <ul>
+            <li>Adicionado método para mudar o tipo da vaga.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>5. Observações Finais</h2>
+        <p>Essas atualizações foram 90% feitas aqui devido a problemas de lógica e organização que encontrei durante o desenvolvimento. A reorganização das funções e a mudança de responsabilidades para as models garantiram uma aplicação mais coesa e fácil de manter. O uso de boas práticas de orientação a objetos e princípios do DDD foram essenciais para a melhoria do código.</p>
+    </div>
+</main>
+
+</body>
+</html>
