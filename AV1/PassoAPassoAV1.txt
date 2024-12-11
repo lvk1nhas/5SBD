@@ -27,5 +27,5 @@ continuarão como pendentes. Ao processar pedidos, aqueles pedidos que possuirem
 Aqueles que não possuirem, se manterão pendentes. Ao processar pedido, caso seja aprovado, será então debitado do estoque a quantidade
 que foi pedida no pedido. 
 
-
-
+Nota: Esqueci de avisar anteriormente que tive problemas com o MySQL, por isso dividi processar pedidos e itens pedidos em duas procedures diferentes
+pois estava sempre enfrentando erros devido as limitações.
