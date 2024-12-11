@@ -16,7 +16,7 @@ Descrição - Fazer o processamento dos itens na tabela wL_itens_pedidos, assim 
 6º passo: ProcedureProcessarPedidos.sql
 Descrição - Fazer o processamento dos pedidos.
 
-Como funciona o código:
+Como funciona esse código:
 
 A procedure inserir dados irá inserir os dados da tabela tempdata para as tabelas convencionais (wl_pedidos etc). 
 Inicialmente o estoque começará vazio, então caso seja processado um item pedido sem o estoque possuir aquele item, 
