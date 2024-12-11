@@ -21,6 +21,8 @@ SET time_zone = "+00:00";
 -- Banco de dados: waterfall
 --
 
+--PROCEDURES
+
 DELIMITER $$
 
 CREATE PROCEDURE InserirDados()
@@ -120,8 +122,6 @@ DELIMITER ;
 
 DELIMITER $$
 
-DELIMITER $$
-
 CREATE DEFINER=root@localhost PROCEDURE ProcessarItensPedidos ()   
 BEGIN
     -- Declarando as variáveis no início da procedure
@@ -200,8 +200,6 @@ BEGIN
 END$$
 
 DELIMITER ;
-
-
 
 DELIMITER $$
 
@@ -310,11 +308,7 @@ END$$
 DELIMITER ;
 
 
-
-
-
-
--- --------------------------------------------------------
+-- TABELAS --------------------------------------------------------
 
 --
 -- Estrutura para tabela wl_clientes
