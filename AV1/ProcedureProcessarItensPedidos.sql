@@ -1,10 +1,15 @@
+DELIMITER $$
+
 CREATE DEFINER=root@localhost PROCEDURE ProcessarItensPedidos ()   
 BEGIN
+    -- Declarando as variáveis no início da procedure
     DECLARE v_codigoPedido INT;
     DECLARE v_codigoProduto VARCHAR(20);
     DECLARE v_quantidade INT;
-    DECLARE pronto INT DEFAULT 0;  -- Indica se o cursor já processou todos os registros
-
+    DECLARE pronta INT DEFAULT 0;  -- Indica se o cursor já processou todos os registros
+    DECLARE estoqueDisponivel INT; -- Declaração da variável de estoque
+    DECLARE quantidadePendente INT; -- Declaração da variável para a quantidade total pendente do produto
+    
     -- Cursor para selecionar os itens dos pedidos
     DECLARE cursor_itens CURSOR FOR 
     SELECT codigoPedido, SKU, quantidade 
@@ -12,7 +17,10 @@ BEGIN
     WHERE status = 'pendente';  -- Apenas itens pendentes serão processados
     
     -- Handler para quando não houver mais registros no cursor
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET pronto = 1;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET pronta = 1;
+
+    -- Início da transação
+    START TRANSACTION;
 
     -- Abrindo o cursor de itens
     OPEN cursor_itens;
@@ -21,26 +29,35 @@ BEGIN
         -- Buscando os dados do cursor
         FETCH cursor_itens INTO v_codigoPedido, v_codigoProduto, v_quantidade;
 
-        IF pronto THEN
+        IF pronta THEN
             LEAVE itens_loop;
         END IF;
 
-        -- Verifica se há quantidade suficiente em estoque
-        IF (SELECT quantidade FROM wl_estoque WHERE SKU = v_codigoProduto) >= v_quantidade THEN
-            -- Aprova o item e ajusta o estoque
+        -- Calcula a quantidade total pendente do produto no estoque
+        SELECT SUM(quantidade) INTO quantidadePendente
+        FROM wl_itens_pedidos 
+        WHERE SKU = v_codigoProduto AND status = 'pendente';
+
+        -- Verifica a quantidade total do item no estoque
+        SELECT quantidade INTO estoqueDisponivel
+        FROM wl_estoque
+        WHERE SKU = v_codigoProduto
+        FOR UPDATE;
+
+        -- Verifica se o estoque disponível é suficiente para todos os itens pendentes
+        IF quantidadePendente <= estoqueDisponivel THEN
+            -- Aprova todos os itens pendentes para esse produto
             UPDATE wl_itens_pedidos 
             SET status = 'aprovado' 
-            WHERE codigoPedido = v_codigoPedido AND SKU = v_codigoProduto;
-
-            UPDATE wl_estoque 
-            SET quantidade = quantidade - v_quantidade 
-            WHERE SKU = v_codigoProduto;
+            WHERE SKU = v_codigoProduto AND status = 'pendente';
+            
         ELSE
-            -- Marca o item como pendente e insere ou atualiza a solicitação de compra
+            -- Marca todos os itens pendentes desse produto como pendentes
             UPDATE wl_itens_pedidos 
             SET status = 'pendente' 
-            WHERE codigoPedido = v_codigoPedido AND SKU = v_codigoProduto;
+            WHERE SKU = v_codigoProduto AND status = 'pendente';
 
+            -- Verifica se o item precisa ser comprado
             IF EXISTS (SELECT 1 FROM wl_compras WHERE SKU = v_codigoProduto) THEN
                 UPDATE wl_compras 
                 SET quantidade = quantidade + v_quantidade 
@@ -54,6 +71,9 @@ BEGIN
 
     -- Fechando o cursor de itens
     CLOSE cursor_itens;
+
+    -- Commit da transação
+    COMMIT;
 
 END$$
 
