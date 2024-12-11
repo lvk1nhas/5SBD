@@ -1,6 +1,6 @@
 --
 -- Estrutura para tabela wl_clientes
---
+---
 
 CREATE TABLE wl_clientes (
   id int(11) NOT NULL,
